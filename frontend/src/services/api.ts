@@ -357,4 +357,16 @@ export async function apiCloseCashShift(data: any) {
   return handleResponse<any>(res);
 }
 
+// ── AUDIT ───────────────────────────────────────────────
+
+export async function apiGetAuditLogs(page = 1, limit = 50) {
+  const res = await fetch(`${API_URL}/audit?page=${page}&limit=${limit}`, { headers: authHeaders() });
+  return handleResponse<{ logs: any[]; total: number; page: number; pages: number }>(res);
+}
+
+export async function apiGetRecentAudit() {
+  const res = await fetch(`${API_URL}/audit/recent`, { headers: authHeaders() });
+  return handleResponse<any[]>(res);
+}
+
 

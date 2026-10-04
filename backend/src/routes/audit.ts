@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { requireAuth } from '../middleware';
+import { authenticate } from '../middleware';
 
 const router = Router();
 const prisma = new PrismaClient();
 
 // GET /api/audit — get audit logs (paginated)
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 50;
@@ -28,7 +28,7 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // GET /api/audit/recent — last 20 for notifications bell
-router.get('/recent', requireAuth, async (req, res) => {
+router.get('/recent', authenticate, async (req, res) => {
   try {
     const logs = await prisma.auditLog.findMany({
       orderBy: { createdAt: 'desc' },

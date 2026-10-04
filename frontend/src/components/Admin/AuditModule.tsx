@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '../../services/api';
+import { apiGetAuditLogs } from '../../services/api';
 import { Shield, RefreshCw, Search, Clock, User, Package, ShoppingBag, LogIn, CreditCard, Trash2, Edit2, AlertCircle } from 'lucide-react';
 
 interface AuditEntry {
@@ -48,7 +48,7 @@ export const AuditModule: React.FC = () => {
   const fetchLogs = useCallback(async (p = 1) => {
     setLoading(true);
     try {
-      const data = await api.get(`/audit?page=${p}&limit=50`);
+      const data = await apiGetAuditLogs(p, 50);
       setLogs(data.logs || []);
       setTotal(data.total || 0);
       setPages(data.pages || 1);
