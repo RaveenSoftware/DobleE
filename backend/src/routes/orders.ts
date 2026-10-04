@@ -141,7 +141,7 @@ router.put('/:id', authenticate, async (req, res) => {
       userEmail: user?.email,
       action: 'ORDER_UPDATED',
       entity: 'Order',
-      entityId: id,
+      entityId: String(id),
       details: dataToUpdate,
     });
 

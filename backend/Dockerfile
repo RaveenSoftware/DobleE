@@ -11,8 +11,8 @@ COPY src ./src/
 COPY tsconfig.json ./
 
 RUN npm install
-RUN npm run build
 RUN npx prisma generate
+RUN npm run build
 
 # Compile seed separately
 RUN npx tsc src/seed.ts --outDir dist/seeds --esModuleInterop --skipLibCheck --noEmitOnError false 2>/dev/null || true
