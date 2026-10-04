@@ -27,5 +27,5 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 5000
 
-# Run migrations and start
-CMD ["sh", "-c", "npx prisma db push && node dist/index.js"]
+# Wait for DB then push schema and start
+CMD ["sh", "-c", "until npx prisma db push; do echo 'Waiting for DB...'; sleep 3; done && node dist/index.js"]
