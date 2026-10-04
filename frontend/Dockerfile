@@ -18,17 +18,12 @@ FROM nginx:alpine AS runner
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# nginx: SPA routing + proxy /api → backend:5000 + video MIME type
 RUN printf 'server {\n\
   listen 80;\n\
   root /usr/share/nginx/html;\n\
   index index.html;\n\
 \n\
-  # Video MIME type\n\
-  types {\n\
-    video/mp4  mp4;\n\
-    video/webm webm;\n\
-  }\n\
+  include /etc/nginx/mime.types;\n\
 \n\
   location /api {\n\
     proxy_pass http://backend:5000;\n\
