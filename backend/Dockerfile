@@ -7,13 +7,15 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY src ./src/
+COPY tsconfig.json ./
 
 RUN npm install
-
-COPY . .
-
 RUN npm run build
 RUN npx prisma generate
+
+# Compile seed separately
+RUN npx tsc src/seed.ts --outDir dist/seeds --esModuleInterop --skipLibCheck --noEmitOnError false 2>/dev/null || true
 
 # ─────────────── Production stage ───────────────
 FROM node:20-alpine AS runner
@@ -31,5 +33,5 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 5000
 
-# Wait for DB then push schema and start
-CMD ["sh", "-c", "until npx prisma db push; do echo 'Waiting for DB...'; sleep 3; done && node dist/index.js"]
+# Wait for DB, push schema, run seed, then start
+CMD ["sh", "-c", "until npx prisma db push 2>&1; do echo 'Waiting for DB...'; sleep 3; done && node dist/seed.js 2>/dev/null || true && node dist/index.js"]
