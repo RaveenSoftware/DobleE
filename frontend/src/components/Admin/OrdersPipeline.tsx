@@ -249,15 +249,15 @@ export const OrdersPipeline: React.FC<OrdersPipelineProps> = ({ onViewOrderRecei
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium pt-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold">
-                        {order.channel || 'Punto de Venta'}
+                  <div className="flex items-center justify-between gap-1 flex-wrap text-[11px] text-slate-400 font-medium pt-0.5">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold truncate max-w-[120px]">
+                        {(order.channel || 'Punto de Venta').replace('Punto de Venta (POS)', 'POS').replace('Punto de Venta', 'POS')}
                       </span>
                       <span>·</span>
-                      <span>{order.paymentMethod}</span>
+                      <span className="truncate">{order.paymentMethod}</span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-400">
+                    <span className="font-mono text-[10px] text-slate-400 shrink-0">
                       {formatDate(order.createdAt)}
                     </span>
                   </div>
