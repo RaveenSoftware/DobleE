@@ -29,6 +29,7 @@ import {
   Store,
   ChefHat,
   ShoppingBag,
+  Menu,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -51,6 +52,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
   } = useApp();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [configName, setConfigName] = useState(config.name);
   const [configPhone, setConfigPhone] = useState(config.phoneWhatsApp);
   const [configAddress, setConfigAddress] = useState(config.address);
@@ -160,12 +162,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
     }
   ];
 
+  const activeLabel = menuSections.flatMap(s => s.items).find(i => i.id === adminSubTab)?.label || 'Panel';
+
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-5">
-      {/* 2-Column High-Density Layout: Left Sidebar (Sticky) + Main Workspace */}
+      {/* Mobile Top Bar */}
+      <div className="lg:hidden flex items-center justify-between mb-4 bg-white rounded-2xl px-4 py-3 border border-slate-200/80 shadow-xs">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+          >
+            <Menu className="w-5 h-5 text-slate-700" />
+          </button>
+          <span className="text-sm font-bold text-slate-800">{activeLabel}</span>
+        </div>
+        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}
+        />
+      )}
+
+      {/* 2-Column Layout: Sidebar + Main */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
         {/* Left Sidebar (Col 1-3) - Sticky in viewport, elegant scroll */}
-        <aside className="lg:col-span-3 lg:sticky lg:top-20 bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4" style={{ maxHeight: 'calc(100vh - 6rem)', overflowY: 'auto', scrollbarWidth: 'none' }}>
+        <aside
+          className={`
+            lg:col-span-3 lg:sticky lg:top-20
+            bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4
+            fixed inset-y-0 left-0 z-50 w-72 transition-transform duration-300 ease-in-out
+            lg:relative lg:inset-auto lg:z-auto lg:w-auto lg:translate-x-0
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          `}
+          style={{ maxHeight: 'calc(100vh - 2rem)', overflowY: 'auto', scrollbarWidth: 'none' }}
+        >
           <div className="space-y-4">
             {/* Sidebar Brand Header */}
             <div className="px-2 pt-1 flex items-center justify-between border-b border-slate-100 pb-2.5">
@@ -177,7 +213,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
                   Administración y Operaciones
                 </span>
               </div>
-              <span className="w-2 h-2 rounded-full bg-emerald-500" title="En línea" />
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" title="En línea" />
+                <button
+                  className="lg:hidden p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
             </div>
 
             {/* Vertical Navigation Links Grouped */}
@@ -192,7 +236,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
                       return (
                         <button
                           key={item.id}
-                          onClick={() => setAdminSubTab(item.id as AdminModuleTab)}
+                          onClick={() => { setAdminSubTab(item.id as AdminModuleTab); setSidebarOpen(false); }}
                           className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                             isActive
                               ? 'bg-amber-500 text-white shadow-xs font-bold'
