@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Lock, User, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import bgImage from '../../assets/images/granizados_hero_banner_1790537423050.jpg';
 
 const appleEase = [0.16, 1, 0.3, 1] as const;
 
@@ -74,7 +75,7 @@ export const LoginPortal: React.FC = () => {
           >
             {/* Imagen de fondo del login */}
             <img
-              src="/src/assets/images/granizados_hero_banner_1790537423050.jpg"
+              src={bgImage}
               alt=""
               className="absolute inset-0 w-full h-full object-cover opacity-40"
             />
