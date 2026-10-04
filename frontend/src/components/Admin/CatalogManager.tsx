@@ -719,8 +719,8 @@ export const CatalogManager: React.FC = () => {
 
       {/* MODAL: CREATE / EDIT PRODUCT - 3-STEP WIZARD */}
       {isProductModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(20px)' }}>
-          <div className="bg-white w-full shadow-2xl overflow-hidden flex flex-col" style={{ maxWidth: '860px', maxHeight: '94vh', borderRadius: '2rem' }}>
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto" style={{ background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(20px)' }}>
+          <div className="bg-white w-full shadow-2xl overflow-hidden flex flex-col my-0 sm:my-4" style={{ maxWidth: '860px', maxHeight: '100dvh', borderRadius: '0 0 2rem 2rem', ['--sm-border-radius' as any]: '2rem' }}>
 
             {/* Header */}
             <div className="flex items-center justify-between px-7 py-5 border-b border-slate-100 shrink-0">

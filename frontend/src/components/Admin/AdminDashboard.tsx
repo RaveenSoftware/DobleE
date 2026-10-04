@@ -196,11 +196,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
           className={`
             lg:col-span-3 lg:sticky lg:top-20
             bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4
-            fixed inset-y-0 left-0 z-50 w-72 transition-transform duration-300 ease-in-out
-            lg:relative lg:inset-auto lg:z-auto lg:w-auto lg:translate-x-0
+            fixed top-16 bottom-0 left-0 z-50 w-72 transition-transform duration-300 ease-in-out
+            lg:relative lg:top-auto lg:bottom-auto lg:z-auto lg:w-auto lg:translate-x-0
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
-          style={{ maxHeight: 'calc(100vh - 2rem)', overflowY: 'auto', scrollbarWidth: 'none' }}
+          style={{ overflowY: 'auto', scrollbarWidth: 'none' }}
         >
           <div className="space-y-4">
             {/* Sidebar Brand Header */}
