@@ -23,8 +23,6 @@ RUN printf 'server {\n\
   root /usr/share/nginx/html;\n\
   index index.html;\n\
 \n\
-  include /etc/nginx/mime.types;\n\
-\n\
   location /api {\n\
     proxy_pass http://backend:5000;\n\
     proxy_http_version 1.1;\n\
