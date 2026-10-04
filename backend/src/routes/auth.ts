@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import { logAudit } from '../audit';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -34,6 +35,17 @@ router.post('/login', async (req, res) => {
       JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    await logAudit({
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      action: 'USER_LOGIN',
+      entity: 'User',
+      entityId: user.id,
+      details: { role: user.role },
+      ip: req.ip,
+    });
 
     res.json({
       token,

@@ -18,6 +18,7 @@ import inventoryRoutes from './routes/inventory';
 import rewardRoutes from './routes/rewards';
 import cashShiftRoutes from './routes/cashshift';
 import flavorRoutes from './routes/flavors';
+import auditRoutes from './routes/audit';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -43,6 +44,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/rewards', rewardRoutes);
 app.use('/api/cashshift', cashShiftRoutes);
 app.use('/api/flavors', flavorRoutes);
+app.use('/api/audit', auditRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', version: '2.0.0', message: 'Granizado DobleE API ✓ Full Persistence' });

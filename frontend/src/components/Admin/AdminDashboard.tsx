@@ -10,8 +10,8 @@ import { InventoryManager } from './InventoryManager';
 import { UsersManager } from './UsersManager';
 import { StaffManager } from './StaffManager';
 import { PosCashier } from './PosCashier';
+import { AuditModule } from './AuditModule';
 import { Order } from '../../types';
-import { formatMoney } from '../../utils/format';
 import {
   LayoutDashboard,
   Layers,
@@ -20,16 +20,14 @@ import {
   QrCode,
   Users,
   Settings,
-  Download,
-  Upload,
-  RotateCcw,
   Boxes,
-  CheckCircle2,
   X,
   Store,
   ChefHat,
   ShoppingBag,
   Menu,
+  Shield,
+  Camera,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -46,9 +44,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
     config,
     currentUser,
     updateConfig,
-    exportDataJson,
-    importDataJson,
-    resetAllData,
   } = useApp();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -58,6 +53,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
   const [configAddress, setConfigAddress] = useState(config.address);
   const [configLogo, setConfigLogo] = useState(config.logoUrl || '');
   const [configCategories, setConfigCategories] = useState(config.customCategories?.join(', ') || 'Frutales, Cremosos, Cítricos & Chamoy, Especiales');
+  const [profileName, setProfileName] = useState(currentUser?.name || '');
+  const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
 
   // Today stats
   const todayStr = new Date().toDateString();
@@ -72,32 +69,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
 
   const lowStockCount = inventory.filter(i => i.currentStock <= i.minAlertStock).length;
   const occupiedTablesCount = tables.filter(t => t.status === 'ocupada' || t.status === 'cuenta').length;
-
-  const handleExport = () => {
-    const jsonStr = exportDataJson();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `doblee-pos-respaldo-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-  };
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = event => {
-      const content = event.target?.result as string;
-      const success = importDataJson(content);
-      if (success) {
-        alert('Datos importados y restaurados exitosamente.');
-      } else {
-        alert('Error al leer el archivo JSON.');
-      }
-    };
-    reader.readAsText(file);
-  };
 
   const handleSaveConfig = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,6 +129,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
         },
         { id: 'users', label: 'Clientes Club', icon: Users },
         { id: 'staff', label: 'Personal', icon: ChefHat },
+        { id: 'audit', label: 'Auditoría', icon: Shield },
       ]
     }
   ];
@@ -268,72 +240,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
             </div>
           </div>
 
-          {/* Bottom Card: Live Cash Drawer / Business Balance */}
-          <div className="space-y-3">
-            <div className="p-3.5 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white space-y-2 relative overflow-hidden shadow-xs">
-              <div>
-                <span className="text-[10px] text-white/90 block font-medium uppercase tracking-wider">
-                  Ventas de Hoy
-                </span>
-                <div className="text-lg font-black font-display tracking-tight text-white">
-                  {formatMoney(todaySales, config.currencySymbol)}
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-white/20 flex items-center justify-between text-xs">
-                <span className="text-[10px] text-white/80">
-                  {todayOrders.length} pedidos hoy
-                </span>
-                <button
-                  onClick={() => setAdminSubTab('finances')}
-                  className="px-2 py-0.5 rounded-md bg-white text-amber-900 font-bold text-[10px] hover:bg-slate-50 transition-colors cursor-pointer"
-                >
-                  Caja
-                </button>
-              </div>
-            </div>
-
-            {/* Settings & Backup Footer Actions */}
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-              <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
-                title="Ajustes del Negocio"
-              >
-                <Settings className="w-3.5 h-3.5" />
-                <span>Ajustes</span>
-              </button>
-
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={handleExport}
-                  className="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-                  title="Exportar respaldo JSON"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                </button>
-
-                <label
-                  className="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-                  title="Importar respaldo JSON"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-                </label>
-
-                <button
-                  onClick={() => {
-                    if (confirm('¿Deseas reiniciar los datos a los valores de prueba originales?')) {
-                      resetAllData();
-                    }
-                  }}
-                  className="p-1.5 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
-                  title="Reiniciar Demo"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
+          {/* Sidebar footer */}
+          <div className="pt-3 border-t border-slate-100">
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer"
+            >
+              <Settings className="w-4 h-4 text-slate-400" />
+              <span>Ajustes del negocio</span>
+            </button>
           </div>
         </aside>
 
@@ -358,97 +273,103 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
             {adminSubTab === 'inventory' && <InventoryManager />}
             {(adminSubTab === 'users' || adminSubTab === 'loyalty') && <UsersManager />}
             {adminSubTab === 'staff' && <StaffManager />}
+            {adminSubTab === 'audit' && <AuditModule />}
           </div>
         </div>
       </div>
 
-      {/* Business Settings Modal */}
+      {/* Settings Modal — with profile photo + business config */}
       {isSettingsOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl border border-slate-100">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-5 shadow-2xl border border-slate-100 my-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="text-base font-bold font-display text-slate-900">
-                Ajustes de {config.name}
-              </h3>
-              <button
-                onClick={() => setIsSettingsOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1"
-              >
+              <div>
+                <h3 className="text-base font-bold font-display text-slate-900">Ajustes</h3>
+                <p className="text-xs text-slate-400">Perfil y configuración del negocio</p>
+              </div>
+              <button onClick={() => setIsSettingsOpen(false)} className="text-slate-400 hover:text-slate-600 p-1">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveConfig} className="space-y-3 text-xs">
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">Nombre Comercial</label>
-                <input
-                  type="text"
-                  required
-                  value={configName}
-                  onChange={e => setConfigName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                />
+            {/* Profile Section */}
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Mi Perfil</p>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                    {profileAvatar
+                      ? <img src={profileAvatar} alt="Foto" className="w-full h-full object-cover" />
+                      : <span className="text-2xl font-black text-white">{(profileName || currentUser?.name || 'A')[0].toUpperCase()}</span>
+                    }
+                  </div>
+                  <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center cursor-pointer shadow-md hover:bg-amber-600 transition-colors">
+                    <Camera className="w-3 h-3 text-white" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = ev => setProfileAvatar(ev.target?.result as string);
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                  </label>
+                </div>
+                <div className="flex-1">
+                  <label className="text-[10px] font-bold text-slate-500 block mb-1">Nombre de Usuario</label>
+                  <input
+                    type="text"
+                    value={profileName}
+                    onChange={e => setProfileName(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    placeholder="Tu nombre"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">{currentUser?.email}</p>
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">WhatsApp de Atención</label>
-                <input
-                  type="text"
-                  required
-                  value={configPhone}
-                  onChange={e => setConfigPhone(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">Dirección del Local</label>
-                <input
-                  type="text"
-                  required
-                  value={configAddress}
-                  onChange={e => setConfigAddress(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">URL Logo (Opcional)</label>
-                <input
-                  type="url"
-                  placeholder="https://ejemplo.com/logo.png"
-                  value={configLogo}
-                  onChange={e => setConfigLogo(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">Categorías de Menú (Separadas por coma)</label>
-                <textarea
-                  rows={2}
-                  value={configCategories}
-                  onChange={e => setConfigCategories(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-[11px]"
-                />
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsSettingsOpen(false)}
-                  className="px-3 py-1.5 rounded-xl border border-slate-200 font-semibold"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold"
-                >
-                  Guardar Ajustes
-                </button>
-              </div>
-            </form>
+            {/* Business Config */}
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Negocio</p>
+              <form onSubmit={handleSaveConfig} className="space-y-3 text-xs">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Nombre Comercial</label>
+                  <input type="text" required value={configName} onChange={e => setConfigName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">WhatsApp de Atención</label>
+                  <input type="text" required value={configPhone} onChange={e => setConfigPhone(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Dirección del Local</label>
+                  <input type="text" required value={configAddress} onChange={e => setConfigAddress(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">URL Logo (Opcional)</label>
+                  <input type="url" placeholder="https://ejemplo.com/logo.png" value={configLogo} onChange={e => setConfigLogo(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Categorías de Menú (por coma)</label>
+                  <textarea rows={2} value={configCategories} onChange={e => setConfigCategories(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-[11px]" />
+                </div>
+                <div className="pt-2 flex justify-end gap-2">
+                  <button type="button" onClick={() => setIsSettingsOpen(false)}
+                    className="px-3 py-1.5 rounded-xl border border-slate-200 font-semibold text-xs">Cancelar</button>
+                  <button type="submit"
+                    className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs">Guardar</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

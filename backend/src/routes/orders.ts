@@ -1,6 +1,7 @@
 import { Router, Request } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authenticate, resolveBranchId } from '../middleware';
+import { logAudit } from '../audit';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -92,6 +93,18 @@ router.post('/', authenticate, async (req: Request & { user?: any }, res) => {
       }
     });
 
+    const user = (req as any).user;
+    await logAudit({
+      branchId,
+      userId: user?.id,
+      userName: user?.name,
+      userEmail: user?.email,
+      action: 'ORDER_CREATED',
+      entity: 'Order',
+      entityId: order.id,
+      details: { customerName: order.customerName, total: order.total, paymentMethod: order.paymentMethod, items: Array.isArray(items) ? items.length : 0 },
+    });
+
     res.status(201).json({
       ...order,
       items: JSON.parse(order.items),
@@ -119,6 +132,17 @@ router.put('/:id', authenticate, async (req, res) => {
     const updated = await prisma.order.update({
       where: { id: id as string },
       data: dataToUpdate,
+    });
+
+    const user = (req as any).user;
+    await logAudit({
+      userId: user?.id,
+      userName: user?.name,
+      userEmail: user?.email,
+      action: 'ORDER_UPDATED',
+      entity: 'Order',
+      entityId: id,
+      details: dataToUpdate,
     });
 
     res.json({
