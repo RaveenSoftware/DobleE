@@ -54,7 +54,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
   const [configLogo, setConfigLogo] = useState(config.logoUrl || '');
   const [configCategories, setConfigCategories] = useState(config.customCategories?.join(', ') || 'Frutales, Cremosos, Cítricos & Chamoy, Especiales');
   const [profileName, setProfileName] = useState(currentUser?.name || '');
-  const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
+  const [profileAvatar, setProfileAvatar] = useState<string | null>(
+    () => localStorage.getItem('user_avatar')
+  );
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const result = ev.target?.result as string;
+      setProfileAvatar(result);
+      localStorage.setItem('user_avatar', result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const result = ev.target?.result as string;
+      setConfigLogo(result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Today stats
   const todayStr = new Date().toDateString();
@@ -76,7 +101,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
       name: configName.trim() || 'DobleE',
       phoneWhatsApp: configPhone.trim(),
       address: configAddress.trim(),
-      logoUrl: configLogo.trim() || undefined,
+      logoUrl: configLogo || undefined,
       customCategories: configCategories.split(',').map(c => c.trim()).filter(Boolean),
     });
     setIsSettingsOpen(false);
@@ -309,13 +334,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={e => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = ev => setProfileAvatar(ev.target?.result as string);
-                        reader.readAsDataURL(file);
-                      }}
+                      onChange={handleAvatarChange}
                     />
                   </label>
                 </div>
@@ -353,9 +372,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500" />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">URL Logo (Opcional)</label>
-                  <input type="url" placeholder="https://ejemplo.com/logo.png" value={configLogo} onChange={e => setConfigLogo(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                  <label className="font-bold text-slate-700 block mb-1">Logo del Negocio</label>
+                  {/* Logo preview */}
+                  {configLogo && (
+                    <div className="mb-2 flex items-center gap-2">
+                      <img src={configLogo} alt="Logo preview" className="h-10 w-auto max-w-[120px] object-contain rounded-lg border border-slate-200 p-1 bg-slate-50" />
+                      <button type="button" onClick={() => setConfigLogo('')} className="text-[10px] text-rose-500 hover:underline cursor-pointer">Quitar</button>
+                    </div>
+                  )}
+                  <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 cursor-pointer transition-colors">
+                    <Camera className="w-4 h-4 text-slate-400" />
+                    <span className="text-[11px] text-slate-500">Subir logo (PNG, SVG, WEBP)</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                  </label>
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Categorías de Menú (por coma)</label>
