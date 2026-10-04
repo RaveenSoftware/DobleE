@@ -41,7 +41,7 @@ async function main() {
     await prisma.topping.upsert({
       where: { id: t.name },
       update: {},
-      create: { id: `top-${toppingsData.indexOf(t) + 1}`, ...t }
+      create: { id: `top-${toppingsData.indexOf(t) + 1}`, branchId: 'branch-1', ...t }
     });
   }
 
@@ -87,6 +87,7 @@ async function main() {
       update: {},
       create: {
         id: `prod-${i + 1}`,
+        branchId: 'branch-1',
         ...p,
         flavors: JSON.stringify(p.flavors),
         isAvailable: true,
