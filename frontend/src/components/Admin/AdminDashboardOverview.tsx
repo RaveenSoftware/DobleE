@@ -901,7 +901,7 @@ export const AdminDashboardOverview: React.FC = () => {
             </div>
 
             {/* Quick visual table grid */}
-            <div className="grid grid-cols-4 gap-2 pt-1">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
               {tables.slice(0, 12).map(table => (
                 <div
                   key={table.id}
