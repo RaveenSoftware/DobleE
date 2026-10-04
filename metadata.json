@@ -1,0 +1,8 @@
+{
+  "name": "Remix Granizados Oasis - Gestión y Club de Fidelización",
+  "description": "Sistema integral de punto de venta, gestión de pedidos, finanzas, inventario y programa de lealtad con puntos de recompensa para emprendimientos de granizados.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

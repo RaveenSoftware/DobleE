@@ -1,0 +1,28 @@
+# Dependencias
+node_modules/
+build/
+dist/
+coverage/
+
+# Archivos de sistema
+.DS_Store
+*.log
+
+# Variables de entorno (NUNCA subir al repo)
+.env
+.env.local
+.env.production
+backend/.env
+frontend/.env
+
+# Solo el ejemplo va al repo
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Base de datos local SQLite (ya no se usa, pero por si acaso)
+*.db
+*.sqlite
+
+# Prisma
+backend/prisma/migrations/*.sql
