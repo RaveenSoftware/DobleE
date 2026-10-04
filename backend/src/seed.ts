@@ -21,6 +21,14 @@ async function main() {
     create: { name: 'Cajero Principal', email: 'cajero@doblee.com', password: cashierPassword, role: 'mesero' }
   });
 
+  // Owner superadmin
+  const ownerPassword = await bcrypt.hash('Kira22', 10);
+  await prisma.user.upsert({
+    where: { email: 'jahir@doblee.com' },
+    update: {},
+    create: { name: 'Jahir (Owner)', email: 'jahir@doblee.com', password: ownerPassword, role: 'superadmin' }
+  });
+
   console.log('✅ Users seeded (admin@doblee.com / admin123)');
 
   // ── Toppings ──────────────────────────────────────────────
