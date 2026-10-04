@@ -1,4 +1,7 @@
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = isLocalDev
+  ? (import.meta.env.VITE_API_URL || 'http://localhost:5000/api')
+  : '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('doblee_token');
