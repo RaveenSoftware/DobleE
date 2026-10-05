@@ -1,6 +1,7 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authenticate } from '../middleware';
+import { logAudit } from '../audit';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -46,6 +47,19 @@ router.post('/', authenticate, async (req: Request & { user?: any }, res: Respon
         allowedToppingIds: allowedToppingIds ? JSON.stringify(allowedToppingIds) : null,
       }
     });
+
+    const user = (req as any).user;
+    await logAudit({
+      branchId,
+      userId: user?.id,
+      userName: user?.name,
+      userEmail: user?.email,
+      action: 'PRODUCT_CREATED',
+      entity: 'Product',
+      entityId: product.id,
+      details: { name, category, basePrice: Number(basePrice) },
+    });
+
     res.status(201).json({ ...product, flavors: JSON.parse(product.flavors), sizePrices: product.sizePrices ? JSON.parse(product.sizePrices) : null });
   } catch (error) {
     console.error(error);
@@ -74,6 +88,18 @@ router.put('/:id', authenticate, async (req: Request & { user?: any }, res: Resp
         allowedToppingIds: allowedToppingIds ? JSON.stringify(allowedToppingIds) : null,
       }
     });
+
+    const user = (req as any).user;
+    await logAudit({
+      userId: user?.id,
+      userName: user?.name,
+      userEmail: user?.email,
+      action: 'PRODUCT_UPDATED',
+      entity: 'Product',
+      entityId: id,
+      details: { name, category, basePrice: Number(basePrice), isAvailable: isAvailable !== false },
+    });
+
     res.json({ ...product, flavors: JSON.parse(product.flavors), sizePrices: product.sizePrices ? JSON.parse(product.sizePrices) : null });
   } catch (error) {
     console.error(error);
@@ -84,7 +110,21 @@ router.put('/:id', authenticate, async (req: Request & { user?: any }, res: Resp
 // DELETE /api/products/:id
 router.delete('/:id', authenticate, async (req: Request & { user?: any }, res: Response) => {
   try {
-    await prisma.product.delete({ where: { id: String(req.params.id) } });
+    const id = String(req.params.id);
+    const product = await prisma.product.findUnique({ where: { id } }).catch(() => null);
+    await prisma.product.delete({ where: { id } });
+
+    const user = (req as any).user;
+    await logAudit({
+      userId: user?.id,
+      userName: user?.name,
+      userEmail: user?.email,
+      action: 'PRODUCT_DELETED',
+      entity: 'Product',
+      entityId: id,
+      details: { name: (product as any)?.name || id },
+    });
+
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar producto' });

@@ -192,14 +192,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
         <aside
           className={`
             lg:col-span-3 lg:sticky lg:top-20
-            bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4
-            fixed top-16 bottom-0 left-0 z-50 w-72 transition-transform duration-300 ease-in-out
-            lg:relative lg:top-auto lg:bottom-auto lg:z-auto lg:w-auto lg:translate-x-0
+            bg-white lg:rounded-2xl lg:border lg:border-slate-200/80 lg:shadow-xs
+            fixed top-0 bottom-0 left-0 z-50 w-72 sm:w-80 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none
+            lg:relative lg:z-auto lg:w-auto lg:translate-x-0 flex flex-col
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
           style={{ overflowY: 'auto', scrollbarWidth: 'none' }}
         >
-          <div className="space-y-4">
+          <div className="p-4 sm:p-5 flex flex-col justify-between h-full space-y-4">
             {/* Sidebar Brand Header */}
             <div className="px-2 pt-1 flex items-center justify-between border-b border-slate-100 pb-2.5">
               <div>
@@ -273,6 +273,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
             >
               <Settings className="w-4 h-4 text-slate-400" />
               <span>Ajustes del negocio</span>
+            </button>
+            <button
+              onClick={logout}
+              className="w-full lg:hidden flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors mt-2 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Cerrar Sesión</span>
             </button>
           </div>
         </aside>

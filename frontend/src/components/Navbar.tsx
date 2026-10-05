@@ -47,6 +47,47 @@ function relativeTime(dt: string) {
   return new Date(dt).toLocaleDateString('es-CO', { dateStyle: 'short' });
 }
 
+function fmt(n: number) {
+  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
+}
+
+function getNotifDescription(n: any): { title: string; subtitle: string } {
+  let details: any = {};
+  try { if (n.details) details = JSON.parse(n.details); } catch { /* ignore */ }
+  const by = n.userName ? ` · por ${n.userName}` : '';
+
+  switch (n.action) {
+    case 'ORDER_CREATED':
+      return {
+        title: `Nuevo pedido de ${details.customerName || 'Cliente'}`,
+        subtitle: `${details.itemCount || '?'} item(s) · ${details.total ? fmt(details.total) : ''} · ${details.table || 'Mostrador'}${by}`,
+      };
+    case 'ORDER_UPDATED':
+      if (details.status) {
+        return { title: `Pedido actualizado → ${details.status}`, subtitle: `Mesa: ${details.tableName || '-'}${by}` };
+      }
+      return { title: 'Pedido modificado', subtitle: `Campos: ${Object.keys(details).join(', ')}${by}` };
+    case 'ORDER_DELETED':
+      return { title: 'Pedido eliminado', subtitle: by.trim() };
+    case 'PRODUCT_CREATED':
+      return { title: `Nuevo producto: "${details.name || '?'}"`, subtitle: `${details.category || ''} · ${details.basePrice ? fmt(details.basePrice) : ''}${by}` };
+    case 'PRODUCT_UPDATED':
+      return { title: `Producto actualizado: "${details.name || '?'}"`, subtitle: `${details.category || ''}${by}` };
+    case 'PRODUCT_DELETED':
+      return { title: `Producto eliminado: "${details.name || '?'}"`, subtitle: by.trim() };
+    case 'USER_LOGIN':
+      return { title: `Inicio de sesión`, subtitle: `${n.userName || 'Usuario'} (${details.role || 'desconocido'}) · ${n.ip || ''}` };
+    case 'CASHSHIFT_OPENED':
+      return { title: 'Caja abierta', subtitle: `${details.openingCash ? fmt(details.openingCash) : ''} apertura${by}` };
+    case 'CASHSHIFT_CLOSED':
+      return { title: 'Caja cerrada', subtitle: `${details.closingCash ? fmt(details.closingCash) : ''}${by}` };
+    case 'EXPENSE_CREATED':
+      return { title: `Gasto: "${details.description || '?'}"`, subtitle: `${details.amount ? fmt(details.amount) : ''}${by}` };
+    default:
+      return { title: n.action.replace(/_/g, ' '), subtitle: by.trim() };
+  }
+}
+
 export const Navbar: React.FC = () => {
   const { config, currentUser, logout, orders } = useApp();
 
