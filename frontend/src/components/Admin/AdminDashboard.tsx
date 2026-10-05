@@ -28,6 +28,7 @@ import {
   Menu,
   Shield,
   Camera,
+  LogOut,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
