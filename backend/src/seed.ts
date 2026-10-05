@@ -45,11 +45,12 @@ async function main() {
     { name: 'Leche Condensada', category: 'Crocante & Lácteos', price: 1000, cost: 300 },
   ];
 
-  for (const t of toppingsData) {
+  for (let i = 0; i < toppingsData.length; i++) {
+    const t = toppingsData[i];
     await prisma.topping.upsert({
-      where: { id: t.name },
+      where: { id: `top-${i + 1}` },
       update: {},
-      create: { id: `top-${toppingsData.indexOf(t) + 1}`, branchId: 'branch-1', ...t }
+      create: { id: `top-${i + 1}`, branchId: 'branch-1', ...t }
     });
   }
 

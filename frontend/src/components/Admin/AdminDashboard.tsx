@@ -43,6 +43,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
     inventory,
     config,
     currentUser,
+    logout,
     updateConfig,
   } = useApp();
 
