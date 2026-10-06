@@ -351,30 +351,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const branchId = currentUser?.branchId || undefined;
 
-    api.apiGetProducts(branchId).then(data => setProducts(data.map((p: any) => ({ ...p, defaultFlavors: p.flavors || [] })))).catch(console.error);
-    api.apiGetToppings(branchId).then(setToppings).catch(console.error);
-    api.apiGetFlavors(branchId).then(setFlavors).catch(console.error);
+    const fetchAllData = () => {
+      api.apiGetProducts(branchId).then(data => setProducts(data.map((p: any) => ({ ...p, defaultFlavors: p.flavors || [] })))).catch(console.error);
+      api.apiGetToppings(branchId).then(setToppings).catch(console.error);
+      api.apiGetFlavors(branchId).then(setFlavors).catch(console.error);
 
-    if (currentUser) {
-      api.apiGetOrders(branchId).then(data => setOrders(data.map((o: any) => ({ ...o, items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items })))).catch((e) => {
-        // If 401, token expired — auto logout
-        if (e.message?.includes('autorizado') || e.message?.includes('Token')) {
-          logout();
-        }
-      });
-      api.apiGetCustomers(branchId).then(setCustomers).catch(console.error);
-      api.apiGetStaff(branchId).then(setStaff).catch(console.error);
-      api.apiGetTables(branchId).then(setTables).catch(console.error);
-      api.apiGetExpenses(branchId).then(setExpenses).catch(console.error);
-      api.apiGetInventory(branchId).then(setInventory).catch(console.error);
-      api.apiGetRewards(branchId).then(setRewards).catch(console.error);
-      // Always try to fetch active cash shift — backend resolves branchId from JWT
-      api.apiGetActiveCashShift(branchId || '').then(shift => {
-        if (shift && shift.isOpen !== undefined) {
-          setCashShift({ isOpen: shift.isOpen, initialAmount: shift.initialAmount, openedAt: shift.openedAt, openedBy: shift.openedBy, notes: shift.notes });
-        }
-      }).catch(console.error);
-    }
+      if (currentUser) {
+        api.apiGetOrders(branchId).then(data => setOrders(data.map((o: any) => ({ ...o, items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items })))).catch((e) => {
+          // If 401, token expired — auto logout
+          if (e.message?.includes('autorizado') || e.message?.includes('Token')) {
+            logout();
+          }
+        });
+        api.apiGetCustomers(branchId).then(setCustomers).catch(console.error);
+        api.apiGetStaff(branchId).then(setStaff).catch(console.error);
+        api.apiGetTables(branchId).then(setTables).catch(console.error);
+        api.apiGetExpenses(branchId).then(setExpenses).catch(console.error);
+        api.apiGetInventory(branchId).then(setInventory).catch(console.error);
+        api.apiGetRewards(branchId).then(setRewards).catch(console.error);
+        // Always try to fetch active cash shift — backend resolves branchId from JWT
+        api.apiGetActiveCashShift(branchId || '').then(shift => {
+          if (shift && shift.isOpen !== undefined) {
+            setCashShift(prev => {
+              if (prev.isOpen === shift.isOpen && prev.initialAmount === shift.initialAmount && prev.openedAt === shift.openedAt) return prev;
+              return { isOpen: shift.isOpen, initialAmount: shift.initialAmount, openedAt: shift.openedAt, openedBy: shift.openedBy, notes: shift.notes };
+            });
+          }
+        }).catch(console.error);
+      }
+    };
+
+    fetchAllData();
+    const intervalId = setInterval(fetchAllData, 10000); // Auto-refresh every 10 segundos
+
+    return () => clearInterval(intervalId);
   }, [currentUser]);
 
   const updateConfig = (newConfig: Partial<BusinessConfig>) => {
