@@ -34,6 +34,11 @@ RUN printf 'server {\n\
   location / {\n\
     try_files $uri $uri/ /index.html;\n\
   }\n\
+\n\
+  location ~ ^/index\\.html$ {\n\
+    add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";\n\
+    try_files $uri /index.html;\n\
+  }\n\
 }\n' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
