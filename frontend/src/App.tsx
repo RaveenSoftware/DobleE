@@ -87,7 +87,7 @@ const MainAppContent: React.FC = () => {
   const { currentUser, config } = useApp();
   const [receiptToView, setReceiptToView] = useState<Order | null>(null);
   const [showIntro, setShowIntro] = useState(false);
-  const prevUser = React.useRef<typeof currentUser>(null);
+  const prevUser = React.useRef<typeof currentUser>(currentUser);
 
   // Detecta cuando el usuario acaba de logearse (de null → user)
   useEffect(() => {
