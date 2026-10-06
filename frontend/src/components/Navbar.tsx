@@ -152,7 +152,7 @@ export const Navbar: React.FC = () => {
   const RoleIcon = currentRoleInfo.icon;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-2xs">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Brand Lockup */}
@@ -222,15 +222,16 @@ export const Navbar: React.FC = () => {
 
                 {/* Audit events */}
                 <div className="max-h-72 overflow-y-auto divide-y divide-slate-50">
-                  {notifications.length === 0 ? (
+                  {notifications.filter((n: any) => n.action !== 'USER_LOGIN').length === 0 ? (
                     <div className="px-4 py-8 text-center">
                       <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2" />
                       <p className="text-xs text-slate-400">Sin notificaciones</p>
                     </div>
                   ) : (
-                    notifications.map((n: any) => {
+                    notifications.filter((n: any) => n.action !== 'USER_LOGIN').map((n: any) => {
                       const Icon = ACTION_ICON[n.action] || AlertCircle;
                       const color = ACTION_COLOR[n.action] || 'bg-slate-100 text-slate-600';
+                      const { title, subtitle } = getNotifDescription(n);
                       return (
                         <div key={n.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors">
                           <div className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${color}`}>
@@ -238,10 +239,10 @@ export const Navbar: React.FC = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-800 truncate">
-                              {n.action.replace(/_/g, ' ')}
+                              {title}
                             </p>
-                            <p className="text-[10px] text-slate-400">
-                              {n.userName || 'Sistema'} · {relativeTime(n.createdAt)}
+                            <p className="text-[10px] text-slate-400 truncate">
+                              {subtitle} · {relativeTime(n.createdAt)}
                             </p>
                           </div>
                         </div>
