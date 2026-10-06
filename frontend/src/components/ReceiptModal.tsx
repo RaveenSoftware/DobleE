@@ -37,11 +37,14 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ order, onClose }) =>
 
         <div id="printable-receipt" className="p-6 space-y-4">
           <div className="text-center pb-3 border-b border-dashed border-slate-300 space-y-1">
+            {config.logoUrl && (
+              <img src={config.logoUrl} alt="Logo" className="w-16 h-16 mx-auto object-contain mb-2 grayscale" />
+            )}
             <h2 className="text-lg font-bold font-display text-slate-900">{config.name}</h2>
             <p className="text-[11px] text-slate-500">{config.address}</p>
             <p className="text-[11px] text-slate-500">WhatsApp: {config.phoneWhatsApp}</p>
             <span className="inline-block mt-1 font-mono text-xs font-bold bg-slate-100 px-2 py-0.5 rounded">
-              Ticket #{order.id}
+              Ticket #{order.id.slice(0, 8)}
             </span>
           </div>
 

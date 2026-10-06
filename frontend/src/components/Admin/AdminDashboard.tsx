@@ -63,11 +63,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 1.5 * 1024 * 1024) {
+      alert('La imagen es muy grande. Por favor usa una menor a 1.5MB');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = ev => {
       const result = ev.target?.result as string;
       setProfileAvatar(result);
-      localStorage.setItem('user_avatar', result);
+      try {
+        localStorage.setItem('user_avatar', result);
+      } catch (err) {
+        alert('No se pudo guardar la imagen (es muy pesada o no hay espacio).');
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -75,6 +83,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 1.5 * 1024 * 1024) {
+      alert('La imagen es muy grande. Por favor usa una menor a 1.5MB');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = ev => {
       const result = ev.target?.result as string;
@@ -165,18 +177,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-5">
-      {/* Mobile Top Bar */}
-      <div className="lg:hidden flex items-center justify-between mb-4 bg-white rounded-2xl px-4 py-3 border border-slate-200/80 shadow-xs">
+      {/* Mobile Top Bar - iOS Glassmorphism Style */}
+      <div className="lg:hidden sticky top-4 z-40 mb-6 bg-white/70 backdrop-blur-xl rounded-[28px] px-5 py-3.5 border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-2 rounded-2xl bg-black/5 hover:bg-black/10 transition-colors cursor-pointer active:scale-95"
           >
-            <Menu className="w-5 h-5 text-slate-700" />
+            <Menu className="w-5 h-5 text-slate-800" />
           </button>
-          <span className="text-sm font-bold text-slate-800">{activeLabel}</span>
+          <span className="text-[15px] font-semibold tracking-tight text-slate-900">{activeLabel}</span>
         </div>
-        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 p-[2px] shadow-sm">
+           <div className="w-full h-full rounded-full border-2 border-white overflow-hidden bg-white flex items-center justify-center">
+             {profileAvatar ? <img src={profileAvatar} className="w-full h-full object-cover" /> : <span className="text-[10px] font-bold">{(currentUser?.name || 'A')[0]}</span>}
+           </div>
+        </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -361,7 +377,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
               </div>
             </div>
 
-            {/* Business Config */}
+            {/* Business Config (Restricted to Superadmin) */}
+            {currentUser?.role === 'superadmin' && (
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Negocio</p>
               <form onSubmit={handleSaveConfig} className="space-y-3 text-xs">
@@ -408,6 +425,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
                 </div>
               </form>
             </div>
+            )}
+            
+            {/* Save Profile Button (if not superadmin, the form above is hidden so we need a separate save for profile) */}
+            {currentUser?.role !== 'superadmin' && (
+              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100 mt-4">
+                <button type="button" onClick={() => setIsSettingsOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs w-full">Cerrar</button>
+              </div>
+            )}
           </div>
         </div>
       )}
