@@ -176,22 +176,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
   const activeLabel = menuSections.flatMap(s => s.items).find(i => i.id === adminSubTab)?.label || 'Panel';
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-5">
-      {/* Mobile Top Bar - iOS Glassmorphism Style */}
-      <div className="lg:hidden sticky top-4 z-40 mb-6 bg-white/70 backdrop-blur-xl rounded-[28px] px-5 py-3.5 border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-2xl bg-black/5 hover:bg-black/10 transition-colors cursor-pointer active:scale-95"
-          >
-            <Menu className="w-5 h-5 text-slate-800" />
+    <div className="max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-5 pb-24 lg:pb-5">
+      {/* Mobile Bottom Tab Bar (Apple Style) */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl border-t border-slate-200/50 pb-safe shadow-[0_-8px_30px_rgb(0,0,0,0.08)]">
+        <div className="flex items-center justify-around px-2 py-2">
+          <button onClick={() => setAdminSubTab('dashboard')} className={`flex flex-col items-center p-2 rounded-xl transition-colors ${adminSubTab === 'dashboard' ? 'text-amber-500' : 'text-slate-400'}`}>
+            <LayoutDashboard className="w-[22px] h-[22px] mb-1" />
+            <span className="text-[10px] font-medium">Inicio</span>
           </button>
-          <span className="text-[15px] font-semibold tracking-tight text-slate-900">{activeLabel}</span>
-        </div>
-        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 p-[2px] shadow-sm">
-           <div className="w-full h-full rounded-full border-2 border-white overflow-hidden bg-white flex items-center justify-center">
-             {profileAvatar ? <img src={profileAvatar} className="w-full h-full object-cover" /> : <span className="text-[10px] font-bold">{(currentUser?.name || 'A')[0]}</span>}
-           </div>
+          <button onClick={() => setAdminSubTab('pos')} className={`flex flex-col items-center p-2 rounded-xl transition-colors ${adminSubTab === 'pos' ? 'text-amber-500' : 'text-slate-400'}`}>
+            <ShoppingBag className="w-[22px] h-[22px] mb-1" />
+            <span className="text-[10px] font-medium">POS</span>
+          </button>
+          <button onClick={() => setAdminSubTab('orders')} className={`relative flex flex-col items-center p-2 rounded-xl transition-colors ${adminSubTab === 'orders' ? 'text-amber-500' : 'text-slate-400'}`}>
+            <div className="relative">
+              <Layers className="w-[22px] h-[22px] mb-1" />
+              {pendingCount.length > 0 && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border border-white"></span>}
+            </div>
+            <span className="text-[10px] font-medium">Pedidos</span>
+          </button>
+          <button onClick={() => setAdminSubTab('tables')} className={`flex flex-col items-center p-2 rounded-xl transition-colors ${adminSubTab === 'tables' ? 'text-amber-500' : 'text-slate-400'}`}>
+             <Store className="w-[22px] h-[22px] mb-1" />
+             <span className="text-[10px] font-medium">Mesas</span>
+          </button>
+          <button onClick={() => setSidebarOpen(true)} className="flex flex-col items-center p-2 rounded-xl text-slate-400 transition-colors">
+            <Menu className="w-[22px] h-[22px] mb-1" />
+            <span className="text-[10px] font-medium">Menú</span>
+          </button>
         </div>
       </div>
 

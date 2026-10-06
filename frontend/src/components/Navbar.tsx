@@ -199,7 +199,7 @@ export const Navbar: React.FC = () => {
 
             {/* Notification Dropdown */}
             {notifOpen && (
-              <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
+              <div className="absolute right-[-60px] sm:right-0 top-12 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-800">Notificaciones</span>
                   <button onClick={() => setNotifOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
