@@ -18,10 +18,22 @@ router.get('/', async (req, res) => {
 
 // CREATE customer
 router.post('/', async (req, res) => {
-  const { branchId, name, email, phone } = req.body;
+  const { branchId, name, email, phone, points, lifetimePoints, totalSpent, ordersCount, tier } = req.body;
   if (!branchId || !name || !phone) return res.status(400).json({ error: 'branchId, name y phone son requeridos' });
   try {
-    const customer = await prisma.customer.create({ data: { branchId, name, email: email || null, phone } });
+    const customer = await prisma.customer.create({ 
+      data: { 
+        branchId, 
+        name, 
+        email: email || null, 
+        phone,
+        points: points || 0,
+        lifetimePoints: lifetimePoints || 0,
+        totalSpent: totalSpent || 0,
+        ordersCount: ordersCount || 0,
+        tier: tier || 'Bronce'
+      } 
+    });
     res.json(customer);
   } catch {
     res.status(500).json({ error: 'Error al crear cliente' });

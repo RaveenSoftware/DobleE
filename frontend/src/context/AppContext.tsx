@@ -500,7 +500,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       totalSpent: 0,
       ordersCount: 0,
       tier: 'Bronce',
-      branchId: currentUser?.branchId
+      branchId: currentUser?.branchId || selectedBranchId
     };
 
     try {
