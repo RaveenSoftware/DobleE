@@ -123,11 +123,11 @@ const MainAppContent: React.FC = () => {
         <div className="min-h-screen flex flex-col bg-[#F8F9FD] text-[#0F172A] font-sans">
           <Navbar />
           <main className="flex-1">
-            {currentUser.role === 'admin' && (
+            {['admin', 'cajero'].includes(currentUser.role.toLowerCase()) && (
               <AdminDashboard onViewOrderReceipt={order => setReceiptToView(order)} />
             )}
-            {currentUser.role === 'mesero' && <WaiterView />}
-            {currentUser.role === 'superadmin' && <SuperAdminView />}
+            {currentUser.role.toLowerCase() === 'mesero' && <WaiterView />}
+            {currentUser.role.toLowerCase() === 'superadmin' && <SuperAdminView />}
           </main>
 
           <footer className="mt-12 bg-white border-t border-slate-100 py-6">

@@ -121,6 +121,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
     setIsSettingsOpen(false);
   };
 
+  const isCajero = currentUser?.role?.toLowerCase() === 'cajero';
+
   const menuSections = [
     {
       title: 'Inicio',
@@ -148,16 +150,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
         },
       ]
     },
-    {
+    ...(isCajero ? [] : [{
       title: 'Catálogo',
       items: [
         { id: 'catalog', label: 'Productos', icon: Package },
         { id: 'menu_qr', label: 'Menú QR', icon: QrCode },
       ]
-    },
+    }]),
     {
       title: 'Administración',
-      items: [
+      items: isCajero ? [
+        { id: 'finances', label: 'Finanzas & Caja', icon: TrendingUp }
+      ] : [
         { id: 'finances', label: 'Finanzas & Caja', icon: TrendingUp },
         {
           id: 'inventory',
