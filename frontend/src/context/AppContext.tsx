@@ -118,7 +118,7 @@ interface AppContextType {
   // Customer in Session (Loyalty or Lookup)
   activeCustomer: Customer | null;
   setActiveCustomer: (customer: Customer | null) => void;
-  loginOrRegisterCustomer: (name: string, phone: string, email?: string) => Customer;
+  loginOrRegisterCustomer: (name: string, phone: string, email?: string) => Promise<Customer>;
   logoutCustomer: () => void;
 
   // Order Operations
@@ -470,7 +470,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return 'Bronce';
   };
 
-  const loginOrRegisterCustomer = (name: string, phone: string, email?: string): Customer => {
+  const loginOrRegisterCustomer = async (name: string, phone: string, email?: string): Promise<Customer> => {
     const cleanPhone = phone.trim().replace(/\D/g, '');
     const existing = customers.find(c => c.phone.replace(/\D/g, '') === cleanPhone);
 
@@ -480,13 +480,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         name: name.trim() || existing.name,
         email: email?.trim() || existing.email,
       };
+      
+      try {
+        await api.apiUpdateCustomer(existing.id, { name: updated.name, email: updated.email });
+      } catch (e) { console.error(e); }
+
       setCustomers(prev => prev.map(c => (c.id === existing.id ? updated : c)));
       setActiveCustomer(updated);
       return updated;
     }
 
-    const newCust: Customer = {
-      id: `cust-${Date.now()}`,
+    // New Customer
+    const newCustPayload = {
       name: name.trim(),
       phone: phone.trim(),
       email: email?.trim() || '',
@@ -495,12 +500,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       totalSpent: 0,
       ordersCount: 0,
       tier: 'Bronce',
-      createdAt: new Date().toISOString().split('T')[0],
+      branchId: currentUser?.branchId
     };
 
-    setCustomers(prev => [newCust, ...prev]);
-    setActiveCustomer(newCust);
-    return newCust;
+    try {
+      const created = await api.apiCreateCustomer(newCustPayload);
+      setCustomers(prev => [created, ...prev]);
+      setActiveCustomer(created);
+      return created;
+    } catch (e) {
+      console.error(e);
+      // Fallback
+      const fakeIdCust = { ...newCustPayload, id: `cust-${Date.now()}`, createdAt: new Date().toISOString() };
+      setCustomers(prev => [fakeIdCust, ...prev]);
+      setActiveCustomer(fakeIdCust);
+      return fakeIdCust;
+    }
   };
 
   const logoutCustomer = () => {
@@ -604,6 +619,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Update customer stats if registered
     if (orderData.customerId) {
+      let finalPoints = 0;
+      let finalLifetime = 0;
+      let finalSpent = 0;
+      let finalCount = 0;
+      let finalTier: CustomerTier = 'Bronce';
+      let finalLastOrderDate = new Date().toISOString().split('T')[0];
+      
       setCustomers(prev =>
         prev.map(c => {
           if (c.id === orderData.customerId) {
@@ -611,14 +633,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             const newLifetime = c.lifetimePoints + pointsEarned;
             const newSpent = c.totalSpent + total;
             const newCount = c.ordersCount + 1;
+            
+            finalPoints = newPoints;
+            finalLifetime = newLifetime;
+            finalSpent = newSpent;
+            finalCount = newCount;
+            finalTier = calculateTier(newLifetime);
+            
             return {
               ...c,
               points: newPoints,
               lifetimePoints: newLifetime,
               totalSpent: newSpent,
               ordersCount: newCount,
-              tier: calculateTier(newLifetime),
-              lastOrderDate: new Date().toISOString().split('T')[0],
+              tier: finalTier,
+              lastOrderDate: finalLastOrderDate,
             };
           }
           return c;
@@ -628,18 +657,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (activeCustomer && activeCustomer.id === orderData.customerId) {
         setActiveCustomer(prev => {
           if (!prev) return null;
-          const newPoints = Math.max(0, prev.points - pointsUsed + pointsEarned);
-          const newLifetime = prev.lifetimePoints + pointsEarned;
           return {
             ...prev,
-            points: newPoints,
-            lifetimePoints: newLifetime,
-            totalSpent: prev.totalSpent + total,
-            ordersCount: prev.ordersCount + 1,
-            tier: calculateTier(newLifetime),
-            lastOrderDate: new Date().toISOString().split('T')[0],
+            points: finalPoints,
+            lifetimePoints: finalLifetime,
+            totalSpent: finalSpent,
+            ordersCount: finalCount,
+            tier: finalTier,
+            lastOrderDate: finalLastOrderDate,
           };
         });
+      }
+      
+      // Persist to backend
+      if (!orderData.customerId.startsWith('cust-')) {
+        api.apiUpdateCustomer(orderData.customerId, {
+          points: finalPoints,
+          lifetimePoints: finalLifetime,
+          totalSpent: finalSpent,
+          ordersCount: finalCount,
+          tier: finalTier,
+          lastOrderDate: finalLastOrderDate
+        }).catch(console.error);
       }
     }
 

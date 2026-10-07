@@ -196,12 +196,12 @@ export const WaiterView: React.FC = () => {
     customerMode === 'club' ? Math.floor(total / config.pointsPerAmount) : 0;
 
   // Send comanda to kitchen/bartender
-  const handleSendComanda = () => {
+  const handleSendComanda = async () => {
     if (comandaItems.length === 0) return;
 
     let finalCustomer = matchedCustomer;
     if (customerMode === 'club' && !finalCustomer && customerPhone.trim()) {
-      finalCustomer = loginOrRegisterCustomer(
+      finalCustomer = await loginOrRegisterCustomer(
         customerName.trim() || 'Cliente Frecuente',
         customerPhone.trim()
       );
@@ -362,7 +362,7 @@ export const WaiterView: React.FC = () => {
         )}
         {waiterTab === 'history' && (
           <div className="lg:col-span-10">
-            <OrdersPipeline />
+            <OrdersPipeline onViewOrderReceipt={(order) => { console.log('Ver ticket', order.id); }} />
           </div>
         )}
         {waiterTab === 'club' && (

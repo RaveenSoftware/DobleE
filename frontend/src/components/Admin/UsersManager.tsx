@@ -75,10 +75,10 @@ export const UsersManager: React.FC = () => {
   const totalPointsCirculating = customers.reduce((sum, c) => sum + c.points, 0);
   const totalCustomerSpend = customers.reduce((sum, c) => sum + c.totalSpent, 0);
 
-  const handleCreateCustomer = (e: React.FormEvent) => {
+  const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim() || !newPhone.trim()) return;
-    loginOrRegisterCustomer(newName.trim(), newPhone.trim(), newEmail.trim() || undefined);
+    await loginOrRegisterCustomer(newName.trim(), newPhone.trim(), newEmail.trim() || undefined);
     setNewName('');
     setNewPhone('');
     setNewEmail('');

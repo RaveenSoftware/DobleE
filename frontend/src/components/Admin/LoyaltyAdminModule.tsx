@@ -71,10 +71,10 @@ export const LoyaltyAdminModule: React.FC = () => {
     setIsAdjustModalOpen(false);
   };
 
-  const handleCreateCustomer = (e: React.FormEvent) => {
+  const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim() || !newPhone.trim()) return;
-    loginOrRegisterCustomer(newName.trim(), newPhone.trim(), newEmail.trim() || undefined);
+    await loginOrRegisterCustomer(newName.trim(), newPhone.trim(), newEmail.trim() || undefined);
     setNewName('');
     setNewPhone('');
     setNewEmail('');
