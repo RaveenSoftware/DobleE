@@ -42,6 +42,7 @@ interface TableReservation {
 
 export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt }) => {
   const {
+    currentUser,
     tables,
     orders,
     products,
@@ -57,6 +58,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
   } = useApp();
 
   // Active Salon / Area
+  const isCajero = ['cajero', 'caja'].includes(currentUser?.role?.toLowerCase()?.trim() || '');
   const [activeArea, setActiveArea] = useState<string>('Salón Principal');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | TableStatus>('all');
   const [onlyActiveFilter, setOnlyActiveFilter] = useState(false);
@@ -633,29 +635,33 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
             </span>
 
             {/* Crear Mesa Button */}
-            <button
-              onClick={() => {
-                setNewTableName(`Mesa ${tables.length + 1}`);
-                setNewTableArea(activeArea !== 'all' ? activeArea : 'Salón Principal');
-                setNewTableCapacity(4);
-                setNewTableShape('cuadrada');
-                setNewTableStatus('libre');
-                setIsCreateModalOpen(true);
-              }}
-              className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5 text-slate-500" />
-              <span>Crear mesa</span>
-            </button>
+            {!isCajero && (
+              <button
+                onClick={() => {
+                  setNewTableName(`Mesa ${tables.length + 1}`);
+                  setNewTableArea(activeArea !== 'all' ? activeArea : 'Salón Principal');
+                  setNewTableCapacity(4);
+                  setNewTableShape('cuadrada');
+                  setNewTableStatus('libre');
+                  setIsCreateModalOpen(true);
+                }}
+                className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 text-slate-500" />
+                <span>Crear mesa</span>
+              </button>
+            )}
 
             {/* Salon Options Button */}
-            <button
-              onClick={() => setIsSalonManagerModalOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-              <span>Opciones</span>
-            </button>
+            {!isCajero && (
+              <button
+                onClick={() => setIsSalonManagerModalOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>Opciones</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -845,13 +851,15 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
                     </div>
 
                     {/* Opciones Button (Light lavender / soft purple full-width) */}
-                    <button
-                      onClick={() => handleOpenTableOptions(table)}
-                      className="bg-[#EEF2FF] hover:bg-[#E0E7FF] active:scale-98 text-[#4F46E5] font-bold text-xs py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 w-full transition-all cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#4F46E5]" />
-                      <span>Opciones</span>
-                    </button>
+                    {!isCajero && (
+                      <button
+                        onClick={() => handleOpenTableOptions(table)}
+                        className="bg-[#EEF2FF] hover:bg-[#E0E7FF] active:scale-98 text-[#4F46E5] font-bold text-xs py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 w-full transition-all cursor-pointer"
+                      >
+                        <Sparkles className="w-3 h-3 text-[#4F46E5]" />
+                        <span>Opciones</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               );
