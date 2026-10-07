@@ -121,7 +121,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
     setIsSettingsOpen(false);
   };
 
-  const isCajero = currentUser?.role?.toLowerCase() === 'cajero';
+  const isCajero = ['cajero', 'caja'].includes(currentUser?.role?.toLowerCase()?.trim() || '');
 
   React.useEffect(() => {
     if (isCajero && adminSubTab === 'dashboard') {
