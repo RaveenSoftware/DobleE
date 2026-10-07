@@ -42,6 +42,9 @@ import {
 } from 'lucide-react';
 
 import { MenuQrManager } from '../Admin/MenuQrManager';
+import { TablesManager } from '../Admin/TablesManager';
+import { OrdersPipeline } from '../Admin/OrdersPipeline';
+import { UsersManager } from '../Admin/UsersManager';
 
 export const WaiterView: React.FC = () => {
   const {
@@ -347,11 +350,27 @@ export const WaiterView: React.FC = () => {
         </aside>
 
           {/* Center Content: Menu Showcase & Category Cards (6 cols) */}
-        {waiterTab === 'qr' ? (
+        {waiterTab === 'qr' && (
           <div className="lg:col-span-10">
             <MenuQrManager />
           </div>
-        ) : (
+        )}
+        {waiterTab === 'tables' && (
+          <div className="lg:col-span-10">
+            <TablesManager />
+          </div>
+        )}
+        {waiterTab === 'history' && (
+          <div className="lg:col-span-10">
+            <OrdersPipeline />
+          </div>
+        )}
+        {waiterTab === 'club' && (
+          <div className="lg:col-span-10">
+            <UsersManager />
+          </div>
+        )}
+        {waiterTab === 'pos' && (
           <div className="lg:col-span-6 space-y-6">
             {/* Top Bar: "Hello, Patricia" Style Header + Search */}
             <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -528,7 +547,7 @@ export const WaiterView: React.FC = () => {
         )}
 
         {/* 3. Right Sidebar: "Your Balance" & "Order Menu" (4 cols - matching image.png right column) */}
-        {waiterTab !== 'qr' && (
+        {waiterTab === 'pos' && (
           <div className="lg:col-span-4 space-y-5">
             {/* Top Icons & User Status Row */}
           <div className="bg-white rounded-3xl p-4 border border-slate-100 shadow-xs flex items-center justify-between">
