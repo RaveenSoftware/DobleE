@@ -569,27 +569,31 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
             </label>
 
             {/* Mesas ocultas Button */}
-            <button
-              onClick={() => setIsHiddenTablesModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
-            >
-              <EyeOff className="w-3.5 h-3.5 text-slate-500" />
-              <span>Mesas ocultas</span>
-              {hiddenTablesCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold">
-                  {hiddenTablesCount}
-                </span>
-              )}
-            </button>
+            {!isCajero && (
+              <button
+                onClick={() => setIsHiddenTablesModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+              >
+                <EyeOff className="w-3.5 h-3.5 text-slate-500" />
+                <span>Mesas ocultas</span>
+                {hiddenTablesCount > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold">
+                    {hiddenTablesCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             {/* Agenda Button */}
-            <button
-              onClick={() => setIsAgendaModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
-            >
-              <Calendar className="w-3.5 h-3.5 text-slate-500" />
-              <span>Agenda</span>
-            </button>
+            {!isCajero && (
+              <button
+                onClick={() => setIsAgendaModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+              >
+                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                <span>Agenda</span>
+              </button>
+            )}
           </div>
         </div>
 
