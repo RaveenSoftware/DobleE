@@ -58,7 +58,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
   } = useApp();
 
   // Active Salon / Area
-  const isCajero = ['cajero', 'caja'].includes(currentUser?.role?.toLowerCase()?.trim() || '');
+  const isRestrictedRole = ['cajero', 'caja', 'mesero'].includes(currentUser?.role?.toLowerCase()?.trim() || '');
   const [activeArea, setActiveArea] = useState<string>('Salón Principal');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | TableStatus>('all');
   const [onlyActiveFilter, setOnlyActiveFilter] = useState(false);
@@ -569,7 +569,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
             </label>
 
             {/* Mesas ocultas Button */}
-            {!isCajero && (
+            {!isRestrictedRole && (
               <button
                 onClick={() => setIsHiddenTablesModalOpen(true)}
                 className="px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
@@ -585,7 +585,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
             )}
 
             {/* Agenda Button */}
-            {!isCajero && (
+            {!isRestrictedRole && (
               <button
                 onClick={() => setIsAgendaModalOpen(true)}
                 className="px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
@@ -639,7 +639,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
             </span>
 
             {/* Crear Mesa Button */}
-            {!isCajero && (
+            {!isRestrictedRole && (
               <button
                 onClick={() => {
                   setNewTableName(`Mesa ${tables.length + 1}`);
@@ -657,7 +657,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
             )}
 
             {/* Salon Options Button */}
-            {!isCajero && (
+            {!isRestrictedRole && (
               <button
                 onClick={() => setIsSalonManagerModalOpen(true)}
                 className="px-3.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
@@ -855,7 +855,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
                     </div>
 
                     {/* Opciones Button (Light lavender / soft purple full-width) */}
-                    {!isCajero && (
+                    {!isRestrictedRole && (
                       <button
                         onClick={() => handleOpenTableOptions(table)}
                         className="bg-[#EEF2FF] hover:bg-[#E0E7FF] active:scale-98 text-[#4F46E5] font-bold text-xs py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 w-full transition-all cursor-pointer"
