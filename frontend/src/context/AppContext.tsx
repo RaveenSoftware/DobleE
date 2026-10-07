@@ -283,6 +283,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
         setCurrentUser(user);
         localStorage.setItem('granizados_auth_user', JSON.stringify(user));
+        
+        const roleStr = user.role.toLowerCase().trim();
+        if (['cajero', 'caja'].includes(roleStr)) {
+          setAdminSubTab('pos');
+        } else {
+          setAdminSubTab('dashboard');
+        }
+
         return { success: true };
       }
       
@@ -320,7 +328,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveWaiter(null);
   };
 
-  const [adminSubTab, setAdminSubTab] = useState<AdminModuleTab>('dashboard');
+  const [adminSubTab, setAdminSubTab] = useState<AdminModuleTab>(() => {
+    try {
+      const stored = localStorage.getItem('granizados_auth_user');
+      if (stored) {
+        const user = JSON.parse(stored) as AuthUser;
+        const role = user?.role?.toLowerCase()?.trim() || '';
+        if (['cajero', 'caja'].includes(role)) return 'pos';
+      }
+    } catch {}
+    return 'dashboard';
+  });
 
   const [products, setProducts] = useState<GranizadoProduct[]>([]);
   const [flavors, setFlavors] = useState<Flavor[]>([]);

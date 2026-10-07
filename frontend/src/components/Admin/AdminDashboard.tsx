@@ -329,7 +329,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
         <div className="lg:col-span-9 space-y-4">
           {/* Module View Content */}
           <div>
-            {adminSubTab === 'dashboard' && <AdminDashboardOverview />}
+            {adminSubTab === 'dashboard' && !isCajero && <AdminDashboardOverview />}
             {adminSubTab === 'pos' && <PosCashier onOrderCompleted={() => setAdminSubTab('orders')} />}
             {adminSubTab === 'orders' && <OrdersPipeline onViewOrderReceipt={onViewOrderReceipt} />}
             {adminSubTab === 'tables' && (
@@ -340,13 +340,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
                 }}
               />
             )}
-            {adminSubTab === 'catalog' && <CatalogManager />}
-            {adminSubTab === 'menu_qr' && <MenuQrManager />}
-            {(adminSubTab === 'finances' || adminSubTab === 'expenses') && <FinancesAnalytics />}
-            {adminSubTab === 'inventory' && <InventoryManager />}
-            {(adminSubTab === 'users' || adminSubTab === 'loyalty') && <UsersManager />}
-            {adminSubTab === 'staff' && <StaffManager />}
-            {adminSubTab === 'audit' && <AuditModule />}
+            {adminSubTab === 'catalog' && !isCajero && <CatalogManager />}
+            {adminSubTab === 'menu_qr' && !isCajero && <MenuQrManager />}
+            {(adminSubTab === 'finances' || adminSubTab === 'expenses') && !isCajero && <FinancesAnalytics />}
+            {adminSubTab === 'inventory' && !isCajero && <InventoryManager />}
+            {(adminSubTab === 'users' || adminSubTab === 'loyalty') && !isCajero && <UsersManager />}
+            {adminSubTab === 'staff' && !isCajero && <StaffManager />}
+            {adminSubTab === 'audit' && !isCajero && <AuditModule />}
           </div>
         </div>
       </div>
