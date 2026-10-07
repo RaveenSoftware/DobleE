@@ -35,7 +35,6 @@ import {
   MapPin,
   Utensils,
   Layers,
-  Layers,
   ArrowRight,
   Coffee,
   CheckCircle2,
@@ -525,6 +524,7 @@ export const WaiterView: React.FC = () => {
               ))}
             </div>
           </div>
+          </div>
         )}
 
         {/* 3. Right Sidebar: "Your Balance" & "Order Menu" (4 cols - matching image.png right column) */}
@@ -854,6 +854,7 @@ export const WaiterView: React.FC = () => {
                 <span>Confirmar & Enviar a Preparación</span>
               </button>
             </div>
+          </div>
           </div>
         )}
       </div>

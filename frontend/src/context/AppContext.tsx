@@ -48,7 +48,8 @@ export type AdminModuleTab =
   | 'staff'
   | 'loyalty'
   | 'expenses'
-  | 'settings';
+  | 'settings'
+  | 'audit';
 
 interface AppContextType {
   // Authentication & Credentials Separation
