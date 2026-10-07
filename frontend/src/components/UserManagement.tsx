@@ -14,6 +14,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ roleToCreate }) 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState(roleToCreate === 'admin' ? 'admin' : 'mesero');
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const loadUsers = async () => {
@@ -34,14 +35,14 @@ export const UserManagement: React.FC<UserManagementProps> = ({ roleToCreate }) 
     try {
       if (editingId) {
         // En modo edición, la contraseña es opcional
-        const data: any = { name, email, role: roleToCreate };
+        const data: any = { name, email, role };
         if (password) data.password = password;
         
         await apiUpdateUser(editingId, data);
-        alert(`Usuario ${roleToCreate} actualizado exitosamente.`);
+        alert(`Usuario actualizado exitosamente.`);
       } else {
-        await apiCreateUser({ name, email, password, role: roleToCreate });
-        alert(`Usuario ${roleToCreate} creado exitosamente.`);
+        await apiCreateUser({ name, email, password, role });
+        alert(`Usuario creado exitosamente.`);
       }
       resetForm();
       loadUsers();
@@ -54,6 +55,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ roleToCreate }) 
     setEditingId(user.id);
     setName(user.name);
     setEmail(user.email);
+    setRole(user.role);
     setPassword(''); // No mostramos la contraseña actual por seguridad
   };
 
@@ -73,23 +75,24 @@ export const UserManagement: React.FC<UserManagementProps> = ({ roleToCreate }) 
     setName('');
     setEmail('');
     setPassword('');
+    setRole(roleToCreate === 'admin' ? 'admin' : 'mesero');
   };
 
-  const filteredUsers = users.filter((u) => u.role === roleToCreate);
+  const filteredUsers = users.filter((u) => roleToCreate === 'admin' ? u.role === 'admin' : ['mesero', 'cajero'].includes(u.role));
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mt-6 font-sans">
       <h2 className="text-xl font-black font-display mb-4">
-        Gestión de {roleToCreate === 'admin' ? 'Dueños de Sucursal (Admins)' : 'Meseros'}
+        Gestión de {roleToCreate === 'admin' ? 'Dueños de Sucursal (Admins)' : 'Credenciales de Acceso (Meseros y Cajeros)'}
       </h2>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
         <input
           type="text"
           placeholder="Nombre Completo"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm"
+          className="px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-amber-500 text-sm"
           required
         />
         <input
@@ -97,21 +100,31 @@ export const UserManagement: React.FC<UserManagementProps> = ({ roleToCreate }) 
           placeholder="Correo Electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm"
+          className="px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-amber-500 text-sm"
           required
         />
+        {roleToCreate !== 'admin' && (
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-amber-500 text-sm"
+          >
+            <option value="mesero">Mesero (Toma Pedidos)</option>
+            <option value="cajero">Cajero (Caja y POS)</option>
+          </select>
+        )}
         <input
           type="password"
-          placeholder={editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}
+          placeholder={editingId ? 'Nueva contraseña' : 'Contraseña'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm"
+          className="px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-amber-500 text-sm"
           required={!editingId}
         />
         <div className="flex gap-2">
           <button
             type="submit"
-            className="flex-1 bg-indigo-600 text-white font-bold rounded-xl py-2 px-4 hover:bg-indigo-700 transition flex items-center justify-center gap-2 text-sm"
+            className="flex-1 bg-amber-500 text-white font-bold rounded-xl py-2 px-4 hover:bg-amber-600 transition flex items-center justify-center gap-2 text-sm"
           >
             {editingId ? <Save className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
             {editingId ? 'Guardar' : 'Crear'}
@@ -135,6 +148,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ roleToCreate }) 
             <tr className="border-b border-slate-100 text-sm text-slate-500 uppercase tracking-wider">
               <th className="pb-3 font-semibold">Nombre</th>
               <th className="pb-3 font-semibold">Correo / Acceso</th>
+              <th className="pb-3 font-semibold">Rol / Permiso</th>
               <th className="pb-3 font-semibold text-right">Acciones</th>
             </tr>
           </thead>
@@ -143,6 +157,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ roleToCreate }) 
               <tr key={u.id} className="border-b border-slate-50 hover:bg-slate-50 text-sm transition-colors group">
                 <td className="py-3 font-medium text-slate-900">{u.name}</td>
                 <td className="py-3 text-slate-500">{u.email}</td>
+                <td className="py-3 text-slate-500 capitalize font-semibold">{u.role}</td>
                 <td className="py-3 text-right">
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
