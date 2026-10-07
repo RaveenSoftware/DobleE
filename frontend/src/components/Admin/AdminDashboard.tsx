@@ -163,11 +163,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
         { id: 'menu_qr', label: 'Menú QR', icon: QrCode },
       ]
     }]),
-    {
+    ...(isCajero ? [] : [{
       title: 'Administración',
-      items: isCajero ? [
-        { id: 'finances', label: 'Finanzas & Caja', icon: TrendingUp }
-      ] : [
+      items: [
         { id: 'finances', label: 'Finanzas & Caja', icon: TrendingUp },
         {
           id: 'inventory',
@@ -180,7 +178,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
         { id: 'staff', label: 'Personal', icon: ChefHat },
         { id: 'audit', label: 'Auditoría', icon: Shield },
       ]
-    }
+    }]),
   ];
 
   const activeLabel = menuSections.flatMap(s => s.items).find(i => i.id === adminSubTab)?.label || 'Panel';
@@ -308,13 +306,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
 
           {/* Sidebar footer */}
           <div className="pt-3 border-t border-slate-100">
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer"
-            >
-              <Settings className="w-4 h-4 text-slate-400" />
-              <span>Ajustes del negocio</span>
-            </button>
+            {!isCajero && (
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer"
+              >
+                <Settings className="w-4 h-4 text-slate-400" />
+                <span>Ajustes del negocio</span>
+              </button>
+            )}
             <button
               onClick={logout}
               className="w-full lg:hidden flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors mt-2 cursor-pointer"

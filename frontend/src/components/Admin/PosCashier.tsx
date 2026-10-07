@@ -267,6 +267,23 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
       </div>
 
       {/* ─── Main Workspace ─── */}
+      {!cashShift.isOpen ? (
+        <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white rounded-3xl border border-amber-100 shadow-sm min-h-[50vh]">
+          <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-6">
+            <Lock className="w-10 h-10" />
+          </div>
+          <h3 className="text-2xl font-black font-display text-slate-900 mb-2">La caja está cerrada</h3>
+          <p className="text-sm text-slate-500 max-w-sm mx-auto mb-8">
+            Para poder empezar a registrar ventas, tomar pedidos y facturar, necesitas especificar una base inicial (cambio) y abrir el turno.
+          </p>
+          <button
+            onClick={() => setIsOpeningModalOpen(true)}
+            className="px-8 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm flex items-center gap-2 transition shadow-lg shadow-amber-500/30"
+          >
+            <Unlock className="w-5 h-5" /> Abrir Caja Ahora
+          </button>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
         {/* LEFT PANEL: Menu & Products */}
@@ -553,7 +570,8 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* ─── Product Customization Modal ─── */}
       <AnimatePresence>

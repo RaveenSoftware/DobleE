@@ -145,10 +145,13 @@ export const Navbar: React.FC = () => {
   const roleLabels: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; }> = {
     admin:      { label: 'Administrador',    icon: Store },
     mesero:     { label: 'Mesero en Turno',  icon: ChefHat },
+    cajero:     { label: 'Cajero en Turno',  icon: Store },
+    caja:       { label: 'Cajero en Turno',  icon: Store },
     superadmin: { label: 'Super Admin',      icon: Shield },
   };
 
-  const currentRoleInfo = currentUser?.role ? roleLabels[currentUser.role] ?? roleLabels.admin : roleLabels.admin;
+  const currentRoleStr = currentUser?.role?.toLowerCase()?.trim() || 'admin';
+  const currentRoleInfo = roleLabels[currentRoleStr] ?? roleLabels.admin;
   const RoleIcon = currentRoleInfo.icon;
 
   return (
