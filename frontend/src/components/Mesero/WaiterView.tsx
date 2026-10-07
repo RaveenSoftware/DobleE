@@ -35,10 +35,14 @@ import {
   MapPin,
   Utensils,
   Layers,
+  Layers,
   ArrowRight,
   Coffee,
   CheckCircle2,
+  QrCode,
 } from 'lucide-react';
+
+import { MenuQrManager } from '../Admin/MenuQrManager';
 
 export const WaiterView: React.FC = () => {
   const {
@@ -59,7 +63,7 @@ export const WaiterView: React.FC = () => {
   } = useApp();
 
   // Active navigation tab inside Waiter View
-  const [waiterTab, setWaiterTab] = useState<'pos' | 'tables' | 'history' | 'club'>('pos');
+  const [waiterTab, setWaiterTab] = useState<'pos' | 'tables' | 'history' | 'club' | 'qr'>('pos');
 
   // Active table selected
   const [selectedTable, setSelectedTable] = useState<string>('Mesa 1');
@@ -314,6 +318,18 @@ export const WaiterView: React.FC = () => {
                 <Sparkles className="w-4 h-4" />
                 <span>Club Puntos</span>
               </button>
+
+              <button
+                onClick={() => setWaiterTab('qr')}
+                className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
+                  waiterTab === 'qr'
+                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20 font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <QrCode className="w-4 h-4" />
+                <span>Menú QR</span>
+              </button>
             </nav>
           </div>
 
@@ -331,10 +347,15 @@ export const WaiterView: React.FC = () => {
           </div>
         </aside>
 
-        {/* 2. Center Content: Menu Showcase & Category Cards (6 cols) */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* Top Bar: "Hello, Patricia" Style Header + Search */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Center Content: Menu Showcase & Category Cards (6 cols) */}
+        {waiterTab === 'qr' ? (
+          <div className="lg:col-span-10">
+            <MenuQrManager />
+          </div>
+        ) : (
+          <div className="lg:col-span-6 space-y-6">
+            {/* Top Bar: "Hello, Patricia" Style Header + Search */}
+            <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight flex items-center gap-2">
                 <span>Hola, {activeWaiter?.name || currentUser?.name || 'Mesero'}</span>
@@ -504,11 +525,12 @@ export const WaiterView: React.FC = () => {
               ))}
             </div>
           </div>
-        </div>
+        )}
 
         {/* 3. Right Sidebar: "Your Balance" & "Order Menu" (4 cols - matching image.png right column) */}
-        <div className="lg:col-span-4 space-y-5">
-          {/* Top Icons & User Status Row */}
+        {waiterTab !== 'qr' && (
+          <div className="lg:col-span-4 space-y-5">
+            {/* Top Icons & User Status Row */}
           <div className="bg-white rounded-3xl p-4 border border-slate-100 shadow-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-xs shadow-xs">
@@ -833,7 +855,7 @@ export const WaiterView: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Product Customizer Modal */}

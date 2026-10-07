@@ -123,13 +123,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
 
   const isCajero = currentUser?.role?.toLowerCase() === 'cajero';
 
+  React.useEffect(() => {
+    if (isCajero && adminSubTab === 'dashboard') {
+      setAdminSubTab('pos');
+    }
+  }, [isCajero, adminSubTab, setAdminSubTab]);
+
   const menuSections = [
-    {
+    ...(isCajero ? [] : [{
       title: 'Inicio',
       items: [
         { id: 'dashboard', label: 'Resumen General', icon: LayoutDashboard },
       ]
-    },
+    }]),
     {
       title: 'Ventas',
       items: [
@@ -184,10 +190,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
       {/* Mobile Bottom Tab Bar (Apple Style) */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl border-t border-slate-200/50 pb-safe shadow-[0_-8px_30px_rgb(0,0,0,0.08)]">
         <div className="flex items-center justify-around px-2 py-2">
-          <button onClick={() => setAdminSubTab('dashboard')} className={`flex flex-col items-center p-2 rounded-xl transition-colors ${adminSubTab === 'dashboard' ? 'text-amber-500' : 'text-slate-400'}`}>
-            <LayoutDashboard className="w-[22px] h-[22px] mb-1" />
-            <span className="text-[10px] font-medium">Inicio</span>
-          </button>
+          {!isCajero && (
+            <button onClick={() => setAdminSubTab('dashboard')} className={`flex flex-col items-center p-2 rounded-xl transition-colors ${adminSubTab === 'dashboard' ? 'text-amber-500' : 'text-slate-400'}`}>
+              <LayoutDashboard className="w-[22px] h-[22px] mb-1" />
+              <span className="text-[10px] font-medium">Inicio</span>
+            </button>
+          )}
           <button onClick={() => setAdminSubTab('pos')} className={`flex flex-col items-center p-2 rounded-xl transition-colors ${adminSubTab === 'pos' ? 'text-amber-500' : 'text-slate-400'}`}>
             <ShoppingBag className="w-[22px] h-[22px] mb-1" />
             <span className="text-[10px] font-medium">POS</span>
