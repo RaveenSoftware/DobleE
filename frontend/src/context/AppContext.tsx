@@ -495,8 +495,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       name: name.trim(),
       phone: phone.trim(),
       email: email?.trim() || '',
-      points: 50, // Welcome bonus
-      lifetimePoints: 50,
+      points: 0, 
+      lifetimePoints: 0,
       totalSpent: 0,
       ordersCount: 0,
       tier: 'Bronce',
