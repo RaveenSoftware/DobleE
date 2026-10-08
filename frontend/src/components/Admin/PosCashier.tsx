@@ -185,6 +185,8 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
       customerName: linkedCustomer ? linkedCustomer.name : guestName || 'Mostrador',
       customerPhone: linkedCustomer ? linkedCustomer.phone : undefined,
       tableName: assignedTable || undefined,
+      waiterId: currentUser?.id,
+      waiterName: currentUser?.name,
       items: posItems,
       paymentMethod,
       channel: 'Punto de Venta (POS)',
