@@ -494,88 +494,95 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
               {/* Total & Payment Section */}
               <div className="pt-1.5 border-t border-slate-200 space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-slate-600">Total a Cobrar</span>
+                  <span className="text-sm font-bold text-slate-600">{isDeferred ? 'Total del Pedido' : 'Total a Cobrar'}</span>
                   <span className="text-2xl font-black font-mono text-emerald-600 tracking-tight">
                     {formatMoney(subtotal, config.currencySymbol)}
                   </span>
                 </div>
 
-                {/* Efectivo: cash received + change */}
-                {paymentMethod === 'Efectivo' && (
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <DollarSign className="w-3.5 h-3.5 text-emerald-500 absolute left-3 top-2.5" />
-                      <input
-                        type="number"
-                        placeholder="Efectivo recibido..."
-                        value={cashReceived}
-                        onChange={e => setCashReceived(e.target.value)}
-                        className="w-full pl-8 pr-3 py-2 text-sm font-bold rounded-xl border border-emerald-300 focus:border-emerald-500 outline-none bg-white"
-                      />
-                    </div>
-                    {/* Quick amount buttons */}
-                    {subtotal > 0 && (
-                      <div className="flex gap-1.5 flex-wrap">
-                        {QUICK_CASH_AMOUNTS.map(amt => (
-                          <button
-                            key={amt}
-                            onClick={() => setCashReceived(String(amt))}
-                            className="px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-700 hover:bg-emerald-100 transition"
-                          >
-                            {formatMoney(amt, config.currencySymbol)}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {cashReceived !== '' && (
-                      <div className={`p-2.5 rounded-xl border flex items-center justify-between ${
-                        changeDue >= 0 ? 'bg-emerald-50 border-emerald-300' : 'bg-red-50 border-red-300'
-                      }`}>
-                        {changeDue >= 0 ? (
-                          <>
-                            <span className="text-xs font-bold text-emerald-800">💰 Cambio a devolver:</span>
-                            <span className="text-lg font-black text-emerald-700 font-mono">{formatMoney(changeDue, config.currencySymbol)}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-xs font-bold text-red-700 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> Falta:</span>
-                            <span className="text-base font-black text-red-600 font-mono">{formatMoney(Math.abs(changeDue), config.currencySymbol)}</span>
-                          </>
+                {/* Payment detail sections — only in immediate mode */}
+                {!isDeferred && (
+                  <>
+                    {/* Efectivo: cash received + change */}
+                    {paymentMethod === 'Efectivo' && (
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <DollarSign className="w-3.5 h-3.5 text-emerald-500 absolute left-3 top-2.5" />
+                          <input
+                            type="number"
+                            placeholder="Efectivo recibido..."
+                            value={cashReceived}
+                            onChange={e => setCashReceived(e.target.value)}
+                            className="w-full pl-8 pr-3 py-2 text-sm font-bold rounded-xl border border-emerald-300 focus:border-emerald-500 outline-none bg-white"
+                          />
+                        </div>
+                        {subtotal > 0 && (
+                          <div className="flex gap-1.5 flex-wrap">
+                            {QUICK_CASH_AMOUNTS.map(amt => (
+                              <button
+                                key={amt}
+                                onClick={() => setCashReceived(String(amt))}
+                                className="px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-700 hover:bg-emerald-100 transition"
+                              >
+                                {formatMoney(amt, config.currencySymbol)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {cashReceived !== '' && (
+                          <div className={`p-2.5 rounded-xl border flex items-center justify-between ${
+                            changeDue >= 0 ? 'bg-emerald-50 border-emerald-300' : 'bg-red-50 border-red-300'
+                          }`}>
+                            {changeDue >= 0 ? (
+                              <>
+                                <span className="text-xs font-bold text-emerald-800">💰 Cambio a devolver:</span>
+                                <span className="text-lg font-black text-emerald-700 font-mono">{formatMoney(changeDue, config.currencySymbol)}</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-xs font-bold text-red-700 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> Falta:</span>
+                                <span className="text-base font-black text-red-600 font-mono">{formatMoney(Math.abs(changeDue), config.currencySymbol)}</span>
+                              </>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
-                  </div>
-                )}
 
-                {/* Nequi/Daviplata */}
-                {paymentMethod === 'Transferencia (Nequi/Daviplata)' && (
-                  <div className="p-3 bg-fuchsia-50 rounded-xl border border-fuchsia-200 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Smartphone className="w-4 h-4 text-fuchsia-600" />
-                      <span className="text-xs font-bold text-fuchsia-800">Pago por Transferencia</span>
-                    </div>
-                    <p className="text-[10px] text-fuchsia-700 font-medium">
-                      Solicita al cliente que realice la transferencia por <strong>{formatMoney(subtotal, config.currencySymbol)}</strong> vía Nequi, Daviplata u otro banco digital, y verifica el comprobante antes de confirmar.
-                    </p>
-                  </div>
-                )}
+                    {/* Nequi/Daviplata */}
+                    {paymentMethod === 'Transferencia (Nequi/Daviplata)' && (
+                      <div className="p-3 bg-fuchsia-50 rounded-xl border border-fuchsia-200 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Smartphone className="w-4 h-4 text-fuchsia-600" />
+                          <span className="text-xs font-bold text-fuchsia-800">Pago por Transferencia</span>
+                        </div>
+                        <p className="text-[10px] text-fuchsia-700 font-medium">
+                          Solicita al cliente que realice la transferencia por <strong>{formatMoney(subtotal, config.currencySymbol)}</strong> vía Nequi, Daviplata u otro banco digital, y verifica el comprobante antes de confirmar.
+                        </p>
+                      </div>
+                    )}
 
-                {/* Tarjeta */}
-                {paymentMethod === 'Tarjeta de Crédito/Débito' && (
-                  <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-200">
-                    <span className="text-xs font-bold text-indigo-700 block">
-                      Verifica que el pago por tarjeta o datáfono por <strong>{formatMoney(subtotal, config.currencySymbol)}</strong> se haya procesado correctamente.
-                    </span>
-                  </div>
+                    {/* Tarjeta */}
+                    {paymentMethod === 'Tarjeta de Crédito/Débito' && (
+                      <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-200">
+                        <span className="text-xs font-bold text-indigo-700 block">
+                          Verifica que el pago por tarjeta o datáfono por <strong>{formatMoney(subtotal, config.currencySymbol)}</strong> se haya procesado correctamente.
+                        </span>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <button
-                  disabled={posItems.length === 0 || !cashShift.isOpen || !isEnoughCash}
+                  disabled={posItems.length === 0 || !cashShift.isOpen || (!isDeferred && !isEnoughCash)}
                   onClick={handleCompleteSale}
                   className="w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-black text-white font-black text-base shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
                 >
                   <Check className="w-5 h-5" />
-                  Cobrar {posItems.length > 0 ? formatMoney(subtotal, config.currencySymbol) : ''}
+                  {isDeferred
+                    ? `Registrar Pedido ${posItems.length > 0 ? formatMoney(subtotal, config.currencySymbol) : ''}`
+                    : `Cobrar ${posItems.length > 0 ? formatMoney(subtotal, config.currencySymbol) : ''}`
+                  }
                 </button>
               </div>
             </div>
