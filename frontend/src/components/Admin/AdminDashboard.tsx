@@ -440,6 +440,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
                   <textarea rows={2} value={configCategories} onChange={e => setConfigCategories(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-[11px]" />
                 </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-2">Modo de Cobro</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { value: 'immediate', label: '💳 Cobro inmediato', desc: 'Paga al hacer el pedido' },
+                      { value: 'deferred', label: '🧾 Cobro al final', desc: 'Paga después de consumir' },
+                    ] as const).map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => updateConfig({ paymentMode: opt.value })}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          (config.paymentMode || 'deferred') === opt.value
+                            ? 'border-amber-500 bg-amber-50 text-amber-900'
+                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span className="font-bold text-[11px] block">{opt.label}</span>
+                        <span className="text-[10px] opacity-70">{opt.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="pt-2 flex justify-end gap-2">
                   <button type="button" onClick={() => setIsSettingsOpen(false)}
                     className="px-3 py-1.5 rounded-xl border border-slate-200 font-semibold text-xs">Cancelar</button>

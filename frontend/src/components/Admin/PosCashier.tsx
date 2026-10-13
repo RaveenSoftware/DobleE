@@ -171,6 +171,8 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
     return Math.ceil(subtotal / v) * v;
   }).filter((v, i, arr) => arr.indexOf(v) === i).slice(0, 4);
 
+  const isDeferred = config.paymentMode === 'deferred';
+
   const handleCompleteSale = () => {
     if (posItems.length === 0) return;
 
@@ -188,7 +190,7 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
       waiterId: currentUser?.id,
       waiterName: currentUser?.name,
       items: posItems,
-      paymentMethod,
+      paymentMethod: isDeferred ? 'Pendiente de Pago' : paymentMethod,
       channel: 'Punto de Venta (POS)',
     });
 
@@ -442,45 +444,52 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
                 )}
               </div>
 
-              {/* Payment Methods */}
-              <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Forma de Pago</label>
-                <div className="grid grid-cols-3 gap-1.5">
-                  <button
-                    onClick={() => { setPaymentMethod('Efectivo'); setCashReceived(''); }}
-                    className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition ${
-                      paymentMethod === 'Efectivo'
-                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-                        : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Banknote className={`w-4 h-4 ${paymentMethod === 'Efectivo' ? 'text-emerald-500' : 'text-slate-400'}`} />
-                    Efectivo
-                  </button>
-                  <button
-                    onClick={() => { setPaymentMethod('Transferencia (Nequi/Daviplata)'); setCashReceived(''); }}
-                    className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition ${
-                      paymentMethod === 'Transferencia (Nequi/Daviplata)'
-                        ? 'bg-fuchsia-50 border-fuchsia-500 text-fuchsia-700'
-                        : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Smartphone className={`w-4 h-4 ${paymentMethod === 'Transferencia (Nequi/Daviplata)' ? 'text-fuchsia-500' : 'text-slate-400'}`} />
-                    Nequi
-                  </button>
-                  <button
-                    onClick={() => { setPaymentMethod('Tarjeta de Crédito/Débito'); setCashReceived(''); }}
-                    className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition ${
-                      paymentMethod === 'Tarjeta de Crédito/Débito'
-                        ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                        : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                    }`}
-                  >
-                    <CreditCard className={`w-4 h-4 ${paymentMethod === 'Tarjeta de Crédito/Débito' ? 'text-indigo-500' : 'text-slate-400'}`} />
-                    Tarjeta
-                  </button>
+              {/* Payment Methods — only shown in immediate mode */}
+              {isDeferred ? (
+                <div className="px-3 py-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2">
+                  <span className="text-lg">🧾</span>
+                  <span className="text-[11px] text-amber-800 font-semibold">Cobro al final del consumo. El método de pago se define al cobrar desde Mesas.</span>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Forma de Pago</label>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button
+                      onClick={() => { setPaymentMethod('Efectivo'); setCashReceived(''); }}
+                      className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition ${
+                        paymentMethod === 'Efectivo'
+                          ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
+                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                      }`}
+                    >
+                      <Banknote className={`w-4 h-4 ${paymentMethod === 'Efectivo' ? 'text-emerald-500' : 'text-slate-400'}`} />
+                      Efectivo
+                    </button>
+                    <button
+                      onClick={() => { setPaymentMethod('Transferencia (Nequi/Daviplata)'); setCashReceived(''); }}
+                      className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition ${
+                        paymentMethod === 'Transferencia (Nequi/Daviplata)'
+                          ? 'bg-fuchsia-50 border-fuchsia-500 text-fuchsia-700'
+                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                      }`}
+                    >
+                      <Smartphone className={`w-4 h-4 ${paymentMethod === 'Transferencia (Nequi/Daviplata)' ? 'text-fuchsia-500' : 'text-slate-400'}`} />
+                      Nequi
+                    </button>
+                    <button
+                      onClick={() => { setPaymentMethod('Tarjeta de Crédito/Débito'); setCashReceived(''); }}
+                      className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition ${
+                        paymentMethod === 'Tarjeta de Crédito/Débito'
+                          ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                      }`}
+                    >
+                      <CreditCard className={`w-4 h-4 ${paymentMethod === 'Tarjeta de Crédito/Débito' ? 'text-indigo-500' : 'text-slate-400'}`} />
+                      Tarjeta
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Total & Payment Section */}
               <div className="pt-1.5 border-t border-slate-200 space-y-3">

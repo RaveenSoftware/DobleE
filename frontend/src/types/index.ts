@@ -205,12 +205,13 @@ export interface BusinessConfig {
   currencySymbol: string;
   phoneWhatsApp: string;
   address: string;
-  pointsPerAmount: number; // e.g., 1 point per $100 currency or 1 point per $1
-  pointsValueRate: number; // e.g., 100 points = $10 discount
+  pointsPerAmount: number;
+  pointsValueRate: number;
   minPointsToRedeem: number;
   taxRatePercent?: number;
   logoUrl?: string;
   customCategories?: string[];
+  paymentMode?: 'immediate' | 'deferred'; // 'immediate' = paga al pedir, 'deferred' = paga al final
 }
 
 export interface CashShift {
