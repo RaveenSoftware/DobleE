@@ -87,6 +87,7 @@ export const WaiterView: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Efectivo');
   const [tableNotes, setTableNotes] = useState('');
   const [serviceFeeIncluded, setServiceFeeIncluded] = useState(true);
+  const [orderType, setOrderType] = useState<'mesa' | 'llevar'>('mesa'); // mesa = cobro al final, llevar = paga ya
 
   // Search filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -207,19 +208,21 @@ export const WaiterView: React.FC = () => {
       );
     }
 
+    const isImmediatePay = orderType === 'llevar' || config.paymentMode === 'immediate';
+
     const newOrder = createOrder({
       customerType: customerMode === 'club' ? 'registered' : 'guest',
       customerId: finalCustomer?.id,
       customerName:
         customerMode === 'club'
           ? finalCustomer?.name || customerName.trim() || 'Cliente Club'
-          : guestName.trim() || `Cliente ${selectedTable}`,
+          : guestName.trim() || (orderType === 'llevar' ? 'Para Llevar' : `Cliente ${selectedTable}`),
       customerPhone: finalCustomer?.phone || (customerMode === 'club' ? customerPhone : undefined),
-      tableName: selectedTable,
+      tableName: orderType === 'llevar' ? undefined : selectedTable,
       waiterId: activeWaiter?.id,
       waiterName: activeWaiter?.name,
       items: comandaItems,
-      paymentMethod: config.paymentMode === 'immediate' ? paymentMethod : 'Pendiente de Pago',
+      paymentMethod: isImmediatePay ? paymentMethod : 'Pendiente de Pago',
       channel: 'Comanda Mesero',
       notes: tableNotes.trim() || undefined,
       appliedReward,
@@ -615,7 +618,37 @@ export const WaiterView: React.FC = () => {
             </div>
           </div>
 
-          {/* Mesa & Cliente Context (Your Address in GoMeal) */}
+          {/* Order Type Toggle: Mesa vs Para Llevar */}
+          <div className="bg-white rounded-3xl p-4 border border-slate-100 shadow-xs">
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tipo de Pedido</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setOrderType('mesa')}
+                className={`py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                  orderType === 'mesa'
+                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/25'
+                    : 'bg-slate-50 text-slate-500 border border-slate-200'
+                }`}
+              >
+                🍽️ Para la Mesa
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrderType('llevar')}
+                className={`py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                  orderType === 'llevar'
+                    ? 'bg-slate-900 text-white shadow-md'
+                    : 'bg-slate-50 text-slate-500 border border-slate-200'
+                }`}
+              >
+                🥤 Para Llevar
+              </button>
+            </div>
+          </div>
+
+          {/* Mesa & Cliente Context — only when ordering for table */}
+          {orderType === 'mesa' && (
           <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -691,12 +724,13 @@ export const WaiterView: React.FC = () => {
               </div>
             )}
           </div>
+          )}
 
-          {/* Order Menu (Comanda Activa - matches GoMeal Order Menu) */}
+          {/* Order Menu (Comanda Activa) */}
           <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-900 font-display">
-                Comanda de la Mesa
+                {orderType === 'llevar' ? '🥤 Pedido Para Llevar' : 'Comanda de la Mesa'}
               </h3>
               <span className="text-xs font-mono font-bold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full">
                 {comandaItems.reduce((s, i) => s + i.quantity, 0)} items
@@ -812,8 +846,8 @@ export const WaiterView: React.FC = () => {
                 </span>
               </div>
 
-              {/* Payment: conditional on paymentMode */}
-              {config.paymentMode === 'immediate' ? (
+              {/* Payment: show selector when immediate mode OR para llevar */}
+              {(config.paymentMode === 'immediate' || orderType === 'llevar') ? (
                 <div className="pt-2">
                   <span className="text-[11px] font-bold text-slate-700 block mb-1">
                     Método de Pago
@@ -873,7 +907,13 @@ export const WaiterView: React.FC = () => {
                 }`}
               >
                 <Send className="w-4 h-4" />
-                <span>{config.paymentMode === 'immediate' ? 'Confirmar & Cobrar 💳' : 'Enviar Comanda a Cocina 🍽️'}</span>
+                <span>
+                  {orderType === 'llevar'
+                    ? 'Cobrar y Preparar 🥤'
+                    : config.paymentMode === 'immediate'
+                    ? 'Confirmar & Cobrar 💳'
+                    : 'Enviar Comanda a Cocina 🍽️'}
+                </span>
               </button>
             </div>
           </div>
