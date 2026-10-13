@@ -400,8 +400,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
               </div>
             </div>
 
-            {/* Business Config (Restricted to Superadmin) */}
-            {currentUser?.role === 'superadmin' && (
+            {/* Business Config (Restricted to Superadmin and Admin) */}
+            {(currentUser?.role === 'superadmin' || currentUser?.role === 'admin') && (
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Negocio</p>
               <form onSubmit={handleSaveConfig} className="space-y-3 text-xs">
@@ -473,8 +473,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewOrderRecei
             </div>
             )}
             
-            {/* Save Profile Button (if not superadmin, the form above is hidden so we need a separate save for profile) */}
-            {currentUser?.role !== 'superadmin' && (
+            {/* Save Profile Button (for roles without business config form) */}
+            {currentUser?.role !== 'superadmin' && currentUser?.role !== 'admin' && (
               <div className="pt-2 flex justify-end gap-2 border-t border-slate-100 mt-4">
                 <button type="button" onClick={() => setIsSettingsOpen(false)}
                   className="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs w-full">Cerrar</button>
