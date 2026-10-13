@@ -137,6 +137,7 @@ interface AppContextType {
     appliedReward?: Reward | null;
   }) => Order;
   updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
+  updateOrder: (orderId: string, updates: Partial<Order>) => void;
   assignOrderToTable: (orderId: string, tableName: string) => void;
   cancelOrder: (orderId: string) => void;
   latestCreatedOrder: Order | null;
@@ -748,6 +749,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const updateOrder = (orderId: string, updates: Partial<Order>) => {
+    setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, ...updates } : o)));
+    api.apiUpdateOrder(orderId, updates).catch(console.error);
+  };
+
   const assignOrderToTable = (orderId: string, tableName: string) => {
     const targetOrder = orders.find(o => o.id === orderId);
     if (!targetOrder) return;
@@ -1163,6 +1169,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         logoutCustomer,
         createOrder,
         updateOrderStatus,
+        updateOrder,
         assignOrderToTable,
         cancelOrder,
         cashShift,

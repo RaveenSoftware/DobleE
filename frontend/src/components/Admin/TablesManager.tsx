@@ -53,6 +53,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
     deleteTable,
     updateTableStatus,
     createOrder,
+    updateOrder,
     updateOrderStatus,
     assignOrderToTable,
   } = useApp();
@@ -84,7 +85,7 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
   // Cobrar / Checkout Modal
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [targetTableForCheckout, setTargetTableForCheckout] = useState<TableItem | null>(null);
-  const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Transferencia (Nequi/Daviplata)'>('Efectivo');
+  const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState<'Efectivo' | 'Tarjeta de Crédito/Débito' | 'Transferencia (Nequi/Daviplata)'>('Efectivo');
   const [cashAmountGiven, setCashAmountGiven] = useState<number>(0);
 
   // Agenda / Reservations Modal
@@ -288,6 +289,8 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
 
     const orderData = getTableOrderData(targetTableForCheckout);
     if (orderData.orderId) {
+      // Update payment method on the order first, then mark as delivered
+      updateOrder(orderData.orderId, { paymentMethod: checkoutPaymentMethod });
       updateOrderStatus(orderData.orderId, 'Entregado');
     }
 
@@ -1200,18 +1203,18 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
             <div className="space-y-1.5">
               <label className="font-bold text-xs text-slate-700 block">Medio de Pago</label>
               <div className="grid grid-cols-3 gap-2 text-xs">
-                {(['Efectivo', 'Tarjeta', 'Transferencia (Nequi/Daviplata)'] as const).map(method => (
+                {(['Efectivo', 'Tarjeta de Crédito/Débito', 'Transferencia (Nequi/Daviplata)'] as const).map(method => (
                   <button
                     key={method}
                     type="button"
-                    onClick={() => setCheckoutPaymentMethod(method)}
+                    onClick={() => setCheckoutPaymentMethod(method as any)}
                     className={`py-2 px-2 rounded-xl font-bold text-center border transition-all cursor-pointer ${
                       checkoutPaymentMethod === method
                         ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                         : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                     }`}
                   >
-                    {method === 'Transferencia (Nequi/Daviplata)' ? 'Nequi / Davi' : method}
+                    {method === 'Transferencia (Nequi/Daviplata)' ? 'Nequi / Davi' : method === 'Tarjeta de Crédito/Débito' ? 'Tarjeta' : method}
                   </button>
                 ))}
               </div>

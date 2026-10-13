@@ -219,7 +219,7 @@ export const WaiterView: React.FC = () => {
       waiterId: activeWaiter?.id,
       waiterName: activeWaiter?.name,
       items: comandaItems,
-      paymentMethod,
+      paymentMethod: 'Pendiente de Pago',
       channel: 'Comanda Mesero',
       notes: tableNotes.trim() || undefined,
       appliedReward,
@@ -812,33 +812,10 @@ export const WaiterView: React.FC = () => {
                 </span>
               </div>
 
-              {/* Payment Method Selector */}
-              <div className="pt-2">
-                <span className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Método de Pago Acordado
-                </span>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {(['Efectivo', 'Transferencia (Nequi/Daviplata)', 'Tarjeta de Crédito/Débito'] as PaymentMethod[]).map(
-                    pm => (
-                      <button
-                        key={pm}
-                        type="button"
-                        onClick={() => setPaymentMethod(pm)}
-                        className={`p-1.5 rounded-xl border text-[10px] font-bold text-center truncate transition-colors ${
-                          paymentMethod === pm
-                            ? 'bg-amber-500 text-white border-amber-500'
-                            : 'bg-slate-50 text-slate-600 border-slate-200'
-                        }`}
-                      >
-                        {pm.includes('Efectivo')
-                          ? 'Efectivo'
-                          : pm.includes('Transferencia')
-                          ? 'Nequi / Transf.'
-                          : 'Tarjeta'}
-                      </button>
-                    )
-                  )}
-                </div>
+              {/* Pay Later Note */}
+              <div className="pt-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2">
+                <span className="text-lg">🧾</span>
+                <span className="text-[11px] text-amber-800 font-semibold">El cliente paga al final. El método de pago se define al cobrar desde el módulo de Mesas.</span>
               </div>
 
               {/* Total Display */}
@@ -858,7 +835,7 @@ export const WaiterView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Action Button (GoMeal golden checkout button) */}
+              {/* Action Button */}
               <button
                 type="button"
                 disabled={comandaItems.length === 0}
@@ -870,7 +847,7 @@ export const WaiterView: React.FC = () => {
                 }`}
               >
                 <Send className="w-4 h-4" />
-                <span>Confirmar & Enviar a Preparación</span>
+                <span>Enviar Comanda a Cocina 🍽️</span>
               </button>
             </div>
           </div>

@@ -91,7 +91,7 @@ export interface Customer {
 }
 
 export type OrderStatus = 'Pendiente' | 'En preparación' | 'Listo' | 'Entregado' | 'Cancelado';
-export type PaymentMethod = 'Efectivo' | 'Transferencia (Nequi/Daviplata)' | 'Tarjeta de Crédito/Débito';
+export type PaymentMethod = 'Efectivo' | 'Transferencia (Nequi/Daviplata)' | 'Tarjeta de Crédito/Débito' | 'Pendiente de Pago';
 
 export interface Order {
   id: string;
