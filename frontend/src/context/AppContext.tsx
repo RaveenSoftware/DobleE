@@ -748,8 +748,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     api.apiUpdateOrderStatus(orderId, newStatus).catch(console.error);
 
-    // If delivered or canceled, free the table both in React state and in backend database
-    if (newStatus === 'Entregado' || newStatus === 'Cancelado') {
+    // If canceled, free the table both in React state and in backend database
+    // (When status is 'Entregado', customer is still consuming at the table and will pay upon checkout)
+    if (newStatus === 'Cancelado') {
       const targetOrder = orders.find(o => o.id === orderId);
       const targetTableName = targetOrder?.tableName;
 

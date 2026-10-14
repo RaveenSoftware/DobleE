@@ -186,11 +186,12 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
       };
     }
 
-    // 1. Search in orders array for an active (non-delivered, non-canceled) order for this table
+    // 1. Search in orders array for an active order for this table:
+    // Remains active if unpaid ('Pendiente de Pago' even if 'Entregado'), or being prepared, or is currentOrderId
     const activeOrder = orders.find(
       o => (o.id === table.currentOrderId || (o.tableName && o.tableName.toLowerCase() === table.name.toLowerCase())) &&
-        o.status !== 'Entregado' &&
-        o.status !== 'Cancelado'
+        o.status !== 'Cancelado' &&
+        (o.paymentMethod === 'Pendiente de Pago' || o.id === table.currentOrderId || o.status !== 'Entregado')
     );
     if (activeOrder) {
       const isPaid = activeOrder.paymentMethod !== 'Pendiente de Pago';

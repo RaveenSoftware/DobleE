@@ -169,8 +169,8 @@ router.put('/:id', authenticate, async (req, res) => {
       }
     }
 
-    // Free table if status changed to Entregado or Cancelado
-    if ((status === 'Entregado' || status === 'Cancelado') && updated.tableName) {
+    // Free table ONLY if status changed to Cancelado (when delivered, customer is still consuming at table)
+    if (status === 'Cancelado' && updated.tableName) {
       await prisma.tableItem.updateMany({
         where: { branchId: updated.branchId, name: updated.tableName },
         data: { status: 'libre', currentOrderId: null, orderTotal: 0, activeWaiter: null },
@@ -207,8 +207,9 @@ router.put('/:id/status', authenticate, async (req, res) => {
       data: { status }
     });
 
-    // If order was delivered or canceled, free associated table in database
-    if (status === 'Entregado' || status === 'Cancelado') {
+    // If order was canceled, free associated table in database.
+    // NOTE: When status is 'Entregado', table remains occupied because customer is consuming.
+    if (status === 'Cancelado') {
       if (order.tableName && order.tableName !== 'Sin mesa') {
         await prisma.tableItem.updateMany({
           where: { branchId: order.branchId, name: order.tableName },
