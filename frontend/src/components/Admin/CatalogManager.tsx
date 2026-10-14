@@ -741,7 +741,7 @@ export const CatalogManager: React.FC = () => {
         >
           <div
             className="bg-white flex flex-col shadow-2xl rounded-2xl overflow-hidden border border-slate-100"
-            style={{ width: '100%', maxWidth: '860px', maxHeight: '90vh' }}
+            style={{ width: '100%', maxWidth: '1020px', maxHeight: '92vh' }}
           >
             {/* ─── HEADER ─── */}
             <div className="flex items-center justify-between px-6 py-4 shrink-0 bg-white border-b border-slate-100">
@@ -772,15 +772,15 @@ export const CatalogManager: React.FC = () => {
               <div className="flex flex-col md:flex-row flex-1 min-h-0">
 
                 {/* LEFT COLUMN — Photo, toggles & summary */}
-                <div className="w-full md:w-[310px] shrink-0 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col bg-slate-50/70 overflow-y-auto p-5 space-y-4">
+                <div className="w-full md:w-[280px] shrink-0 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col bg-slate-50/70 overflow-y-auto p-4 sm:p-5 space-y-3.5">
                   {/* Foto preview */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Foto del Granizado</span>
                       <span className="text-[10px] text-slate-400">Vista en menú</span>
                     </div>
 
-                    <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-900 border border-slate-200/80 shadow-md group">
+                    <div className="relative rounded-2xl overflow-hidden aspect-[16/10] bg-slate-900 border border-slate-200/80 shadow-md group">
                       {prodImage ? (
                         <img src={prodImage} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       ) : (
@@ -792,8 +792,8 @@ export const CatalogManager: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
 
                       {/* Badges on preview */}
-                      <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1 pointer-events-none">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-white/95 text-slate-800 shadow-sm">
+                      <div className="absolute top-2 left-2 right-2 flex items-center justify-between gap-1 pointer-events-none">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-white/95 text-slate-800 shadow-sm">
                           {prodCategory}
                         </span>
                         {prodIsPopular && (
@@ -803,7 +803,7 @@ export const CatalogManager: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between gap-2 pointer-events-none">
+                      <div className="absolute bottom-2 left-2 right-2 flex items-end justify-between gap-2 pointer-events-none">
                         <span className="text-white font-black text-sm drop-shadow-md truncate flex-1">
                           {prodName || <span className="text-white/40 font-normal italic">Nombre del granizado</span>}
                         </span>
@@ -966,98 +966,102 @@ export const CatalogManager: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setProdSizes(prev => [...prev, { id: `s${Date.now()}`, label: 'Nuevo', oz: 16, price: 8500, cost: 2500 }])}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs transition-colors border border-amber-200/60 cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs transition-colors border border-amber-200/60 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" /> Agregar Tamaño
                       </button>
                     </div>
 
-                    <div className="border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xs bg-white">
-                      <div
-                        className="grid items-center gap-2 px-3 py-2 bg-slate-50 border-b border-slate-200/80 text-[10px] font-black uppercase text-slate-400 tracking-wider"
-                        style={{ gridTemplateColumns: '1.2fr 56px 105px 105px 65px 36px' }}
-                      >
-                        <span>Presentación</span>
-                        <span className="text-center">Oz</span>
-                        <span>Precio Venta</span>
-                        <span>Costo Base</span>
-                        <span className="text-center">Margen</span>
-                        <span></span>
-                      </div>
+                    <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs bg-white">
+                      <div className="overflow-x-auto">
+                        <div className="min-w-[560px]">
+                          <div
+                            className="grid items-center gap-2.5 px-4 py-2.5 bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase text-slate-500 tracking-wider"
+                            style={{ gridTemplateColumns: 'minmax(140px, 1.8fr) 52px 115px 115px 65px 32px' }}
+                          >
+                            <span>Presentación / Vaso</span>
+                            <span className="text-center">Oz</span>
+                            <span>Precio Venta</span>
+                            <span>Costo Insumos</span>
+                            <span className="text-center">Margen</span>
+                            <span></span>
+                          </div>
 
-                      <div className="p-2 space-y-2">
-                        {prodSizes.map((sz, idx) => {
-                          const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
-                          const isBase = idx === 1 || (prodSizes.length === 1 && idx === 0);
-                          const mgColor = margin >= 60 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : margin >= 40 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
-                          return (
-                            <div
-                              key={sz.id}
-                              className={`grid items-center gap-2 px-3 py-2 rounded-xl transition-all ${isBase ? 'bg-amber-50/40 border border-amber-200/80' : 'bg-slate-50/50 border border-slate-100 hover:border-slate-200'}`}
-                              style={{ gridTemplateColumns: '1.2fr 56px 105px 105px 65px 36px' }}
-                            >
-                              <div>
-                                <input
-                                  type="text"
-                                  value={sz.label}
-                                  onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
-                                  placeholder="Ej. Mediano"
-                                  className="w-full px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-800 border border-slate-200 bg-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
-                                />
-                              </div>
-                              <div>
-                                <input
-                                  type="number"
-                                  min={4}
-                                  value={sz.oz}
-                                  onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, oz: Number(e.target.value) } : s))}
-                                  className="w-full px-1 py-1.5 rounded-lg text-xs font-mono font-bold text-center text-slate-700 border border-slate-200 bg-white focus:outline-none focus:border-amber-400"
-                                />
-                              </div>
-                              <div className="relative">
-                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">$</span>
-                                <input
-                                  type="number"
-                                  min={0}
-                                  step={100}
-                                  value={sz.price}
-                                  onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, price: Number(e.target.value) } : s))}
-                                  className="w-full pl-6 pr-2 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-800 border border-slate-200 bg-white focus:outline-none focus:border-amber-400"
-                                />
-                              </div>
-                              <div className="relative">
-                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">$</span>
-                                <input
-                                  type="number"
-                                  min={0}
-                                  step={100}
-                                  value={sz.cost}
-                                  onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, cost: Number(e.target.value) } : s))}
-                                  className="w-full pl-6 pr-2 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-700 border border-slate-200 bg-white focus:outline-none focus:border-amber-400"
-                                />
-                              </div>
-                              <div className="text-center">
-                                <span className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-black border ${mgColor}`}>
-                                  {margin.toFixed(0)}%
-                                </span>
-                              </div>
-                              <div className="text-center">
-                                {prodSizes.length > 1 ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => setProdSizes(prev => prev.filter((_, i) => i !== idx))}
-                                    className="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors mx-auto cursor-pointer"
-                                    title="Eliminar este tamaño"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                ) : (
-                                  <span className="text-[10px] text-slate-300">—</span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+                          <div className="p-2 space-y-2">
+                            {prodSizes.map((sz, idx) => {
+                              const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
+                              const isBase = idx === 1 || (prodSizes.length === 1 && idx === 0);
+                              const mgColor = margin >= 60 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : margin >= 40 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+                              return (
+                                <div
+                                  key={sz.id}
+                                  className={`grid items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${isBase ? 'bg-amber-50/50 border border-amber-200/90 shadow-2xs' : 'bg-slate-50/50 border border-slate-200/60 hover:bg-white hover:border-slate-300'}`}
+                                  style={{ gridTemplateColumns: 'minmax(140px, 1.8fr) 52px 115px 115px 65px 32px' }}
+                                >
+                                  <div>
+                                    <input
+                                      type="text"
+                                      value={sz.label}
+                                      onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
+                                      placeholder="Ej. Mediano"
+                                      className="w-full px-3 py-2 rounded-lg text-xs font-bold text-slate-800 border border-slate-200 bg-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                                    />
+                                  </div>
+                                  <div>
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      value={sz.oz}
+                                      onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, oz: Number(e.target.value) } : s))}
+                                      className="w-full px-1 py-2 rounded-lg text-xs font-mono font-bold text-center text-slate-700 border border-slate-200 bg-white focus:outline-none focus:border-amber-400"
+                                    />
+                                  </div>
+                                  <div className="relative">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">$</span>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      step={100}
+                                      value={sz.price}
+                                      onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, price: Number(e.target.value) } : s))}
+                                      className="w-full pl-6 pr-2 py-2 rounded-lg text-xs font-mono font-bold text-slate-800 border border-slate-200 bg-white focus:outline-none focus:border-amber-400"
+                                    />
+                                  </div>
+                                  <div className="relative">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">$</span>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      step={100}
+                                      value={sz.cost}
+                                      onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, cost: Number(e.target.value) } : s))}
+                                      className="w-full pl-6 pr-2 py-2 rounded-lg text-xs font-mono font-bold text-slate-700 border border-slate-200 bg-white focus:outline-none focus:border-amber-400"
+                                    />
+                                  </div>
+                                  <div className="text-center">
+                                    <span className={`inline-block px-2.5 py-1 rounded-md text-[11px] font-black border ${mgColor}`}>
+                                      {margin.toFixed(0)}%
+                                    </span>
+                                  </div>
+                                  <div className="text-center">
+                                    {prodSizes.length > 1 ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => setProdSizes(prev => prev.filter((_, i) => i !== idx))}
+                                        className="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors mx-auto cursor-pointer"
+                                        title="Eliminar este tamaño"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-300">—</span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
