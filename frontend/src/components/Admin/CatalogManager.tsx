@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { GranizadoProduct, CategoryType, Topping, Flavor, ProductSize } from '../../types';
 
@@ -26,7 +26,7 @@ import {
 const PRESET_IMAGES = [
   { label: 'Mango Chamoy Especial', url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80' },
   { label: 'Fresa & Leche Condensada', url: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&q=80' },
-  { label: 'MaracuyÃ¡ & LimÃ³n Biche', url: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=400&q=80' },
+  { label: 'Maracuyá & Limón Biche', url: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=400&q=80' },
   { label: 'Banner Tropical DobleE', url: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=400&q=80' },
 ];
 
@@ -61,7 +61,7 @@ export const CatalogManager: React.FC = () => {
   const [prodImage, setProdImage] = useState(PRESET_IMAGES[0].url);
   const [prodIsPopular, setProdIsPopular] = useState(false);
   const [prodIsAvailable, setProdIsAvailable] = useState(true);
-  const [prodFlavorsStr, setProdFlavorsStr] = useState('Mango Biche, LimÃ³n');
+  const [prodFlavorsStr, setProdFlavorsStr] = useState('');
   const [prodAllowedToppings, setProdAllowedToppings] = useState<string[]>([]);
   const [prodToppingsRestricted, setProdToppingsRestricted] = useState(false);
   const [prodPointsEarned, setProdPointsEarned] = useState<number>(85);
@@ -70,7 +70,7 @@ export const CatalogManager: React.FC = () => {
 
   // Custom sizes state (replaces hardcoded small/medium/large)
   const defaultSizes: ProductSize[] = [
-    { id: 's1', label: 'PequeÃ±o', oz: 12, price: 6500, cost: 2200 },
+    { id: 's1', label: 'Pequeño', oz: 12, price: 6500, cost: 2200 },
     { id: 's2', label: 'Mediano', oz: 16, price: 8500, cost: 2800 },
     { id: 's3', label: 'Grande', oz: 24, price: 11000, cost: 3800 },
   ];
@@ -117,7 +117,7 @@ export const CatalogManager: React.FC = () => {
     setProdImage(PRESET_IMAGES[0].url);
     setProdIsPopular(false);
     setProdIsAvailable(true);
-    setProdFlavorsStr('Mango Biche, LimÃ³n');
+    setProdFlavorsStr('');
     setProdAllowedToppings([]);
     setProdToppingsRestricted(false);
     setProdPointsEarned(85);
@@ -136,7 +136,7 @@ export const CatalogManager: React.FC = () => {
       setProdSizes(p.customSizes);
     } else {
       setProdSizes([
-        { id: 's1', label: 'PequeÃ±o', oz: 12, price: p.sizePrices?.small?.price ?? Math.round(p.basePrice * 0.75), cost: p.sizePrices?.small?.cost ?? Math.round(p.baseCost * 0.8) },
+        { id: 's1', label: 'Pequeño', oz: 12, price: p.sizePrices?.small?.price ?? Math.round(p.basePrice * 0.75), cost: p.sizePrices?.small?.cost ?? Math.round(p.baseCost * 0.8) },
         { id: 's2', label: 'Mediano', oz: 16, price: p.basePrice, cost: p.baseCost },
         { id: 's3', label: 'Grande', oz: 24, price: p.sizePrices?.large?.price ?? Math.round(p.basePrice * 1.3), cost: p.sizePrices?.large?.cost ?? Math.round(p.baseCost * 1.35) },
       ]);
@@ -191,7 +191,7 @@ export const CatalogManager: React.FC = () => {
   };
 
   const handleDeleteProduct = (id: string, name: string) => {
-    if (confirm(`Â¿Eliminar producto "${name}" del menÃº de DobleE?`)) {
+    if (confirm(`¿Eliminar producto "${name}" del menú de DobleE?`)) {
       deleteProduct(id);
     }
   };
