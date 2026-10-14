@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { GranizadoProduct, CategoryType, Topping, Flavor, ProductSize } from '../../types';
 
@@ -26,7 +26,7 @@ import {
 const PRESET_IMAGES = [
   { label: 'Mango Chamoy Especial', url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80' },
   { label: 'Fresa & Leche Condensada', url: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&q=80' },
-  { label: 'Maracuyá & Limón Biche', url: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=400&q=80' },
+  { label: 'MaracuyÃ¡ & LimÃ³n Biche', url: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=400&q=80' },
   { label: 'Banner Tropical DobleE', url: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=400&q=80' },
 ];
 
@@ -61,7 +61,7 @@ export const CatalogManager: React.FC = () => {
   const [prodImage, setProdImage] = useState(PRESET_IMAGES[0].url);
   const [prodIsPopular, setProdIsPopular] = useState(false);
   const [prodIsAvailable, setProdIsAvailable] = useState(true);
-  const [prodFlavorsStr, setProdFlavorsStr] = useState('Mango Biche, Limón');
+  const [prodFlavorsStr, setProdFlavorsStr] = useState('Mango Biche, LimÃ³n');
   const [prodAllowedToppings, setProdAllowedToppings] = useState<string[]>([]);
   const [prodToppingsRestricted, setProdToppingsRestricted] = useState(false);
   const [prodPointsEarned, setProdPointsEarned] = useState<number>(85);
@@ -70,7 +70,7 @@ export const CatalogManager: React.FC = () => {
 
   // Custom sizes state (replaces hardcoded small/medium/large)
   const defaultSizes: ProductSize[] = [
-    { id: 's1', label: 'Pequeño', oz: 12, price: 6500, cost: 2200 },
+    { id: 's1', label: 'PequeÃ±o', oz: 12, price: 6500, cost: 2200 },
     { id: 's2', label: 'Mediano', oz: 16, price: 8500, cost: 2800 },
     { id: 's3', label: 'Grande', oz: 24, price: 11000, cost: 3800 },
   ];
@@ -110,14 +110,14 @@ export const CatalogManager: React.FC = () => {
     setProdCategory('Frutales');
     setProdDescription('');
     setProdSizes([
-      { id: 's1', label: 'Pequeño', oz: 12, price: 6500, cost: 2200 },
+      { id: 's1', label: 'PequeÃ±o', oz: 12, price: 6500, cost: 2200 },
       { id: 's2', label: 'Mediano', oz: 16, price: 8500, cost: 2800 },
       { id: 's3', label: 'Grande', oz: 24, price: 11000, cost: 3800 },
     ]);
     setProdImage(PRESET_IMAGES[0].url);
     setProdIsPopular(false);
     setProdIsAvailable(true);
-    setProdFlavorsStr('Mango Biche, Limón');
+    setProdFlavorsStr('Mango Biche, LimÃ³n');
     setProdAllowedToppings([]);
     setProdToppingsRestricted(false);
     setProdPointsEarned(85);
@@ -136,7 +136,7 @@ export const CatalogManager: React.FC = () => {
       setProdSizes(p.customSizes);
     } else {
       setProdSizes([
-        { id: 's1', label: 'Pequeño', oz: 12, price: p.sizePrices?.small?.price ?? Math.round(p.basePrice * 0.75), cost: p.sizePrices?.small?.cost ?? Math.round(p.baseCost * 0.8) },
+        { id: 's1', label: 'PequeÃ±o', oz: 12, price: p.sizePrices?.small?.price ?? Math.round(p.basePrice * 0.75), cost: p.sizePrices?.small?.cost ?? Math.round(p.baseCost * 0.8) },
         { id: 's2', label: 'Mediano', oz: 16, price: p.basePrice, cost: p.baseCost },
         { id: 's3', label: 'Grande', oz: 24, price: p.sizePrices?.large?.price ?? Math.round(p.basePrice * 1.3), cost: p.sizePrices?.large?.cost ?? Math.round(p.baseCost * 1.35) },
       ]);
@@ -191,7 +191,7 @@ export const CatalogManager: React.FC = () => {
   };
 
   const handleDeleteProduct = (id: string, name: string) => {
-    if (confirm(`¿Eliminar producto "${name}" del menú de DobleE?`)) {
+    if (confirm(`Â¿Eliminar producto "${name}" del menÃº de DobleE?`)) {
       deleteProduct(id);
     }
   };
@@ -239,7 +239,7 @@ export const CatalogManager: React.FC = () => {
 
   const dynamicCategories = config.customCategories && config.customCategories.length > 0 
     ? config.customCategories 
-    : ['Frutales', 'Cítricos & Chamoy', 'Cremosos', 'Especiales'];
+    : ['Frutales', 'CÃ­tricos & Chamoy', 'Cremosos', 'Especiales'];
 
   const uniqueCategories = Array.from(new Set([...products.map(p => p.category), ...dynamicCategories]));
 
@@ -254,14 +254,14 @@ export const CatalogManager: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold font-display text-slate-900 tracking-tight">
-              Gestión de Productos
+              GestiÃ³n de Productos
             </h2>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
               {products.length} productos
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Crea y administra granizados, recetas, precios de venta, costos de insumos, sabores, toppings y puntos de fidelización.
+            Crea y administra granizados, recetas, precios de venta, costos de insumos, sabores, toppings y puntos de fidelizaciÃ³n.
           </p>
         </div>
 
@@ -356,7 +356,7 @@ export const CatalogManager: React.FC = () => {
                   className={`p-1 rounded-md transition-colors cursor-pointer ${
                     viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-400 hover:text-slate-700'
                   }`}
-                  title="Vista en Cuadrícula"
+                  title="Vista en CuadrÃ­cula"
                 >
                   <Grid className="w-3.5 h-3.5" />
                 </button>
@@ -471,7 +471,7 @@ export const CatalogManager: React.FC = () => {
                       {p.defaultFlavors && p.defaultFlavors.length > 0 && (
                         <div className="text-[10px] truncate">
                           <span className="text-slate-400">Sabores: </span>
-                          <span className="text-slate-600 font-medium">{p.defaultFlavors.join(' · ')}</span>
+                          <span className="text-slate-600 font-medium">{p.defaultFlavors.join(' Â· ')}</span>
                         </div>
                       )}
 
@@ -537,7 +537,7 @@ export const CatalogManager: React.FC = () => {
                   <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-100 font-semibold">
                     <tr>
                       <th className="py-2.5 px-4">Producto</th>
-                      <th className="py-2.5 px-4">Categoría</th>
+                      <th className="py-2.5 px-4">CategorÃ­a</th>
                       <th className="py-2.5 px-4">Precio Venta</th>
                       <th className="py-2.5 px-4">Costo Base</th>
                       <th className="py-2.5 px-4">Utilidad Neta</th>
@@ -619,7 +619,7 @@ export const CatalogManager: React.FC = () => {
               <Package className="w-10 h-10 text-slate-300 mx-auto" />
               <h3 className="text-sm font-bold text-slate-700">No se encontraron productos</h3>
               <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                No hay productos que coincidan con la búsqueda o la categoría seleccionada.
+                No hay productos que coincidan con la bÃºsqueda o la categorÃ­a seleccionada.
               </p>
               <button
                 onClick={openNewProduct}
@@ -733,364 +733,214 @@ export const CatalogManager: React.FC = () => {
       )}
 
 
-      {/* MODAL: CREATE / EDIT PRODUCT - 3-STEP WIZARD */}
+      {/* MODAL: CREATE / EDIT PRODUCT — Right Drawer */}
       {isProductModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto" style={{ background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(20px)' }}>
-          <div className="bg-white w-full shadow-2xl overflow-hidden flex flex-col my-0 sm:my-4" style={{ maxWidth: '860px', maxHeight: '100dvh', borderRadius: '0 0 2rem 2rem', ['--sm-border-radius' as any]: '2rem' }}>
-
+        <div
+          className="fixed inset-0 z-50 flex justify-end"
+          style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(6px)' }}
+          onClick={e => { if (e.target === e.currentTarget) setIsProductModalOpen(false); }}
+        >
+          <div className="bg-white h-full flex flex-col shadow-2xl overflow-hidden" style={{ width: '100%', maxWidth: '500px' }}>
             {/* Header */}
-            <div className="flex items-center justify-between px-7 py-5 border-b border-slate-100 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg,#f59e0b,#ea580c)' }}>
-                  <Package className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black font-display text-slate-900 tracking-tight">
-                    {editingProductId ? 'Editar Granizado' : 'Crear Nuevo Granizado'}
-                  </h3>
-                  <p className="text-xs text-slate-400 font-medium">
-                    Paso {prodFormStep} de 3 &mdash; {prodFormStep === 1 ? 'Identidad & Foto' : prodFormStep === 2 ? 'Precios por Tamaño' : 'Toppings & Adiciones'}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
+              <div>
+                <h3 className="text-sm font-black text-slate-900">{editingProductId ? 'Editar Producto' : 'Nuevo Granizado'}</h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">Completa los campos y guarda</p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  {([1, 2, 3] as const).map(s => (
-                    <button key={s} type="button" onClick={() => setProdFormStep(s)}
-                      className={`h-2 rounded-full transition-all duration-300 ${prodFormStep === s ? 'w-8 bg-amber-500' : 'w-2 bg-slate-200 hover:bg-slate-300'}`}
-                    />
-                  ))}
-                </div>
-                <button onClick={() => setIsProductModalOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors ml-2">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button onClick={() => setIsProductModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
             </div>
-
             <form onSubmit={handleSaveProduct} className="flex flex-col flex-1 min-h-0">
-              <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
-
-                {/* Left: Live Card Preview */}
-                <div className="lg:w-60 xl:w-68 shrink-0 bg-slate-950 flex flex-col overflow-hidden">
-
-                  {/* Card preview — mimics the real product card */}
-                  <div className="relative w-full flex-1 min-h-0" style={{ minHeight: '220px' }}>
-                    {prodImage ? (
-                      <img src={prodImage} alt="Preview" className="absolute inset-0 w-full h-full object-cover" key={prodImage.substring(0, 30)} />
-                    ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-800">
-                        <ImageIcon className="w-10 h-10 text-slate-600" />
-                        <p className="text-[11px] text-slate-500 text-center">Sin imagen</p>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20" />
-                    {/* Category top-left */}
-                    <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/90 text-slate-900">
-                      {prodCategory}
-                    </span>
-                    {/* Name + stock bottom */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-                      <h4 className="text-sm font-black text-white leading-tight truncate">
-                        {prodName || <span className="text-white/30 font-normal italic">Nombre...</span>}
-                      </h4>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md shrink-0 ${prodIsAvailable ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
-                        {prodIsAvailable ? 'En Stock' : 'Agotado'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Compact description + flavors preview */}
-                  <div className="px-3 pt-2.5 pb-1.5 space-y-1 border-b border-white/5">
-                    <p className="text-[10px] text-white/35 line-clamp-2 leading-relaxed">
-                      {prodDescription || 'Descripción del producto...'}
+              <div className="flex-1 overflow-y-auto">
+                {/* Live preview */}
+                <div className="relative h-48 bg-slate-100 overflow-hidden shrink-0">
+                  {prodImage
+                    ? <img src={prodImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    : <div className="absolute inset-0 flex items-center justify-center"><ImageIcon className="w-10 h-10 text-slate-300" /></div>
+                  }
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
+                  <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white/95 text-slate-800">{prodCategory}</span>
+                  {prodIsPopular && <span className="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-amber-500 text-white flex items-center gap-1"><Star className="w-3 h-3 fill-current"/>Estrella</span>}
+                  <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
+                    <p className="text-white font-black text-sm leading-tight truncate">
+                      {prodName || <span className="font-normal opacity-30 italic">Nombre del producto</span>}
                     </p>
-                    {prodFlavorsStr && (
-                      <p className="text-[10px] text-white/30 truncate">
-                        <span className="text-white/20">Sabores: </span>
-                        <span className="text-white/45">{prodFlavorsStr.split(',').map(s => s.trim()).join(' · ')}</span>
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Image upload area */}
-                  <div className="p-3 space-y-2.5">
-                    <label className="flex items-center gap-2.5 p-2.5 rounded-xl border border-dashed border-white/15 hover:border-amber-400/50 cursor-pointer transition-colors group">
-                      <div className="w-7 h-7 rounded-lg bg-white/8 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
-                        <ImageIcon className="w-3.5 h-3.5 text-white/40 group-hover:text-amber-400 transition-colors" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[11px] font-semibold text-white/60 block leading-tight">Subir imagen</span>
-                        <span className="text-[10px] text-white/25">JPG, PNG, WEBP</span>
-                      </div>
-                      <input type="file" accept="image/*" className="sr-only" onChange={handleImageFileUpload} />
-                    </label>
-                    {/* Quick photos */}
-                    <div className="grid grid-cols-4 gap-1">
-                      {PRESET_IMAGES.map(preset => (
-                        <button key={preset.url} type="button" onClick={() => setProdImage(preset.url)}
-                          className={`relative rounded-lg overflow-hidden aspect-square border transition-all ${prodImage === preset.url ? 'border-amber-500 opacity-100' : 'border-white/10 opacity-40 hover:opacity-80'}`}
-                        >
-                          <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
-                          {prodImage === preset.url && <div className="absolute inset-0 bg-amber-500/25 flex items-center justify-center"><Check className="w-2.5 h-2.5 text-white" /></div>}
-                        </button>
-                      ))}
-                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg shrink-0 ${prodIsAvailable ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+                      {prodIsAvailable ? 'En Stock' : 'Agotado'}
+                    </span>
                   </div>
                 </div>
-
-                {/* Right: Step content */}
-                <div className="flex-1 overflow-y-auto p-7 space-y-5">
-
-                  {/* STEP 1 */}
-                  {prodFormStep === 1 && (
-                    <div className="space-y-5">
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nombre del Granizado *</label>
-                        <input type="text" required value={prodName} onChange={e => setProdName(e.target.value)} placeholder="ej. Granizado Especial Chamoy & Frutas" className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white text-base font-bold text-slate-800 focus:outline-none focus:border-amber-400 transition-colors" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Categoría</label>
-                          <select value={prodCategory} onChange={e => setProdCategory(e.target.value as CategoryType)} className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white text-sm text-slate-700 font-semibold focus:outline-none focus:border-amber-400 transition-colors">
-                            {dynamicCategories.map(cat => (
-                              <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                            {!dynamicCategories.includes(prodCategory) && prodCategory !== '' && (
-                              <option value={prodCategory}>{prodCategory}</option>
-                            )}
-                          </select>
+                <div className="p-5 space-y-5">
+                  {/* Imagen */}
+                  <section className="space-y-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Imagen</p>
+                    <div className="flex gap-2">
+                      <label className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 cursor-pointer transition-colors group">
+                        <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-amber-50 flex items-center justify-center shrink-0 transition-colors">
+                          <ImageIcon className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-500 transition-colors" />
                         </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sabores Base (separados por coma)</label>
-                          <input type="text" value={prodFlavorsStr} onChange={e => setProdFlavorsStr(e.target.value)} placeholder="Mango Biche, Limón Criollo..." className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white text-sm text-slate-700 focus:outline-none focus:border-amber-400 transition-colors" />
+                        <div>
+                          <span className="text-xs font-semibold text-slate-700 block leading-tight">Subir imagen</span>
+                          <span className="text-[10px] text-slate-400">JPG, PNG, WEBP</span>
                         </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Descripción del Producto</label>
-                        <textarea rows={4} value={prodDescription} onChange={e => setProdDescription(e.target.value)} placeholder="¿Qué hace especial a este granizado? Describe sus ingredientes, sabores y la experiencia..." className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white text-sm text-slate-700 focus:outline-none focus:border-amber-400 transition-colors resize-none" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <label className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${prodIsPopular ? 'border-amber-300 bg-amber-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}>
-                          <div className={`w-11 h-6 rounded-full relative transition-colors shrink-0 ${prodIsPopular ? 'bg-amber-500' : 'bg-slate-200'}`}>
-                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${prodIsPopular ? 'translate-x-6' : 'translate-x-1'}`} />
-                            <input type="checkbox" checked={prodIsPopular} onChange={e => setProdIsPopular(e.target.checked)} className="sr-only" />
-                          </div>
-                          <div><span className="text-sm font-bold text-slate-800 block">⭐ Producto Estrella</span><span className="text-[10px] text-slate-400">Destacado en menú y POS</span></div>
-                        </label>
-                        <label className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${prodIsAvailable ? 'border-emerald-300 bg-emerald-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}>
-                          <div className={`w-11 h-6 rounded-full relative transition-colors shrink-0 ${prodIsAvailable ? 'bg-emerald-500' : 'bg-slate-200'}`}>
-                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${prodIsAvailable ? 'translate-x-6' : 'translate-x-1'}`} />
-                            <input type="checkbox" checked={prodIsAvailable} onChange={e => setProdIsAvailable(e.target.checked)} className="sr-only" />
-                          </div>
-                          <div><span className="text-sm font-bold text-slate-800 block">🟢 Disponible en POS</span><span className="text-[10px] text-slate-400">Visible para el cajero</span></div>
-                        </label>
+                        <input type="file" accept="image/*" className="sr-only" onChange={handleImageFileUpload} />
+                      </label>
+                      <div className="flex gap-1">
+                        {PRESET_IMAGES.map(preset => (
+                          <button key={preset.url} type="button" onClick={() => setProdImage(preset.url)}
+                            className={`relative w-11 h-11 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${prodImage === preset.url ? 'border-amber-500' : 'border-slate-200 opacity-50 hover:opacity-100'}`}
+                          >
+                            <img src={preset.url} alt="" className="w-full h-full object-cover" />
+                            {prodImage === preset.url && <div className="absolute inset-0 bg-amber-500/25 flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  )}
-
-                  {/* STEP 2: Tamaños personalizados */}
-                  {prodFormStep === 2 && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-black text-slate-800">Tamaños del Vaso</p>
-                          <p className="text-[11px] text-slate-400">Crea los tamaños que ofreces. El 2° se usa como precio base.</p>
+                  </section>
+                  {/* Info */}
+                  <section className="space-y-2.5">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información</p>
+                    <input type="text" required value={prodName} onChange={e => setProdName(e.target.value)} placeholder="Nombre del granizado *"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm font-bold text-slate-800 focus:outline-none focus:border-amber-400 transition-all" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <select value={prodCategory} onChange={e => setProdCategory(e.target.value as CategoryType)}
+                        className="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm text-slate-700 font-medium focus:outline-none focus:border-amber-400 transition-all">
+                        {dynamicCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        {!dynamicCategories.includes(prodCategory) && prodCategory && <option value={prodCategory}>{prodCategory}</option>}
+                      </select>
+                      <input type="text" value={prodFlavorsStr} onChange={e => setProdFlavorsStr(e.target.value)} placeholder="Sabores (por coma)"
+                        className="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm text-slate-700 focus:outline-none focus:border-amber-400 transition-all" />
+                    </div>
+                    <textarea rows={2} value={prodDescription} onChange={e => setProdDescription(e.target.value)} placeholder="Descripción breve..."
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm text-slate-700 focus:outline-none focus:border-amber-400 transition-all resize-none" />
+                    <div className="flex gap-2">
+                      <label className={`flex-1 flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${prodIsPopular ? 'border-amber-300 bg-amber-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <div className={`w-8 h-5 rounded-full relative transition-colors shrink-0 ${prodIsPopular ? 'bg-amber-500' : 'bg-slate-200'}`}>
+                          <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodIsPopular ? 'translate-x-3' : 'translate-x-0.5'}`} />
+                          <input type="checkbox" checked={prodIsPopular} onChange={e => setProdIsPopular(e.target.checked)} className="sr-only" />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setProdSizes(prev => [...prev, { id: `s${Date.now()}`, label: 'Nuevo', oz: 16, price: 8000, cost: 2500 }])}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors"
-                        >
-                          <Plus className="w-3.5 h-3.5" /> Agregar tamaño
-                        </button>
-                      </div>
-
-                      <div className="space-y-3">
-                        {prodSizes.map((sz, idx) => {
-                          const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
-                          const mc = margin >= 60 ? 'text-emerald-600' : margin >= 40 ? 'text-amber-600' : 'text-rose-500';
-                          const isBase = idx === 1 || (prodSizes.length === 1 && idx === 0);
-                          return (
-                            <div key={sz.id} className={`p-4 rounded-2xl border-2 space-y-3 ${isBase ? 'border-amber-300 bg-amber-50/40' : 'border-slate-100 bg-slate-50/50'}`}>
-                              <div className="flex items-center gap-2">
-                                {/* Name & oz */}
-                                <input
-                                  type="text"
-                                  value={sz.label}
-                                  onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
-                                  placeholder="Nombre"
-                                  className="flex-1 px-3 py-2 text-sm font-bold rounded-xl border-2 border-slate-200 bg-white focus:outline-none focus:border-amber-400"
-                                />
-                                <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl px-2 py-2">
-                                  <input
-                                    type="number"
-                                    value={sz.oz}
-                                    min={4}
-                                    onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, oz: Number(e.target.value) } : s))}
-                                    className="w-10 text-sm font-mono font-bold text-center outline-none bg-transparent"
-                                  />
-                                  <span className="text-[10px] text-slate-400 font-bold">oz</span>
-                                </div>
-                                {isBase && <span className="text-[10px] bg-amber-400 text-white font-bold px-2 py-0.5 rounded-full shrink-0">BASE</span>}
-                                {prodSizes.length > 1 && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setProdSizes(prev => prev.filter((_, i) => i !== idx))}
-                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0"
-                                  >
-                                    <X className="w-3.5 h-3.5" />
-                                  </button>
-                                )}
-                              </div>
-                              <div className="grid grid-cols-3 gap-2 items-center">
-                                <div className="relative">
-                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">$</span>
-                                  <input
-                                    type="number" min="0" step="100"
-                                    value={sz.price}
-                                    onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, price: Number(e.target.value) } : s))}
-                                    className="w-full pl-6 pr-2 py-2 rounded-xl border-2 border-slate-200 bg-white font-mono font-bold text-sm text-slate-800 focus:outline-none focus:border-emerald-400"
-                                  />
-                                  <span className="absolute right-2 bottom-1 text-[9px] text-slate-400">Venta</span>
-                                </div>
-                                <div className="relative">
-                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">$</span>
-                                  <input
-                                    type="number" min="0" step="100"
-                                    value={sz.cost}
-                                    onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, cost: Number(e.target.value) } : s))}
-                                    className="w-full pl-6 pr-2 py-2 rounded-xl border-2 border-slate-200 bg-white font-mono font-bold text-sm text-slate-800 focus:outline-none focus:border-amber-400"
-                                  />
-                                  <span className="absolute right-2 bottom-1 text-[9px] text-slate-400">Costo</span>
-                                </div>
-                                <div className={`text-center py-2 rounded-xl font-black text-lg ${mc}`}>
-                                  {margin.toFixed(0)}%
-                                  <p className="text-[9px] font-normal text-slate-400">margen</p>
-                                </div>
-                              </div>
+                        <span className="text-xs font-semibold text-slate-700">⭐ Estrella</span>
+                      </label>
+                      <label className={`flex-1 flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${prodIsAvailable ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <div className={`w-8 h-5 rounded-full relative transition-colors shrink-0 ${prodIsAvailable ? 'bg-emerald-500' : 'bg-slate-200'}`}>
+                          <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodIsAvailable ? 'translate-x-3' : 'translate-x-0.5'}`} />
+                          <input type="checkbox" checked={prodIsAvailable} onChange={e => setProdIsAvailable(e.target.checked)} className="sr-only" />
+                        </div>
+                        <span className="text-xs font-semibold text-slate-700">🟢 Disponible</span>
+                      </label>
+                    </div>
+                  </section>
+                  {/* Tamaños */}
+                  <section className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tamaños del vaso</p>
+                      <button type="button" onClick={() => setProdSizes(prev => [...prev, { id: `s${Date.now()}`, label: 'Nuevo', oz: 16, price: 8000, cost: 2500 }])}
+                        className="flex items-center gap-1 text-[11px] font-bold text-amber-600 hover:text-amber-700">
+                        <Plus className="w-3.5 h-3.5" /> Agregar
+                      </button>
+                    </div>
+                    <div className="grid text-[10px] font-bold text-slate-400 px-1" style={{ gridTemplateColumns: '1fr 48px 80px 80px 44px' }}>
+                      <span>Nombre</span><span className="text-center">Oz</span><span className="text-center">Venta</span><span className="text-center">Costo</span><span className="text-center">Mg</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {prodSizes.map((sz, idx) => {
+                        const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
+                        const isBase = idx === 1 || (prodSizes.length === 1 && idx === 0);
+                        const mgColor = margin >= 60 ? 'text-emerald-600' : margin >= 40 ? 'text-amber-600' : 'text-rose-500';
+                        return (
+                          <div key={sz.id} className={`grid items-center gap-1 p-2 rounded-xl ${isBase ? 'bg-amber-50 border border-amber-200' : 'bg-slate-50 border border-slate-100'}`} style={{ gridTemplateColumns: '1fr 48px 80px 80px 44px' }}>
+                            <input type="text" value={sz.label} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
+                              className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-400 w-full" />
+                            <input type="number" min={4} value={sz.oz} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, oz: Number(e.target.value) } : s))}
+                              className="px-1 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-center focus:outline-none focus:border-amber-400 w-full" />
+                            <div className="relative">
+                              <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">$</span>
+                              <input type="number" min={0} step={100} value={sz.price} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, price: Number(e.target.value) } : s))}
+                                className="pl-4 pr-1 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold focus:outline-none focus:border-emerald-400 w-full" />
                             </div>
+                            <div className="relative">
+                              <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">$</span>
+                              <input type="number" min={0} step={100} value={sz.cost} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, cost: Number(e.target.value) } : s))}
+                                className="pl-4 pr-1 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold focus:outline-none focus:border-amber-400 w-full" />
+                            </div>
+                            <div className={`text-center text-xs font-black ${mgColor}`}>
+                              {margin.toFixed(0)}%
+                              {prodSizes.length > 1 && (
+                                <button type="button" onClick={() => setProdSizes(prev => prev.filter((_, i) => i !== idx))} className="block mx-auto text-slate-300 hover:text-rose-400 transition-colors">
+                                  <X className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                  {/* Fidelizacion */}
+                  <section className="space-y-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fidelización</p>
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <label className="text-[10px] text-slate-500 font-medium block mb-1">Puntos al comprar</label>
+                        <input type="number" min={0} value={prodPointsEarned} onChange={e => setProdPointsEarned(Number(e.target.value))}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-800 text-sm focus:outline-none focus:border-amber-400" />
+                      </div>
+                      <label className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all flex-1 ${prodPointsDiscountApplicable ? 'border-amber-300 bg-amber-50' : 'border-slate-200'}`}>
+                        <div className={`w-8 h-5 rounded-full relative transition-colors shrink-0 ${prodPointsDiscountApplicable ? 'bg-amber-500' : 'bg-slate-200'}`}>
+                          <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodPointsDiscountApplicable ? 'translate-x-3' : 'translate-x-0.5'}`} />
+                          <input type="checkbox" checked={prodPointsDiscountApplicable} onChange={e => setProdPointsDiscountApplicable(e.target.checked)} className="sr-only" />
+                        </div>
+                        <span className="text-xs font-semibold text-slate-700">Aplica desc. puntos</span>
+                      </label>
+                    </div>
+                  </section>
+                  {/* Toppings */}
+                  <section className="space-y-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Toppings</p>
+                    <div className="flex gap-1 p-1 bg-slate-100 rounded-xl">
+                      <button type="button" onClick={() => { setProdToppingsRestricted(false); setProdAllowedToppings([]); }}
+                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${!prodToppingsRestricted ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500'}`}>
+                        Todos
+                      </button>
+                      <button type="button" onClick={() => setProdToppingsRestricted(true)}
+                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${prodToppingsRestricted ? 'bg-white text-amber-700 shadow-sm' : 'text-slate-500'}`}>
+                        Personalizado
+                      </button>
+                    </div>
+                    {prodToppingsRestricted && (
+                      <div className="grid grid-cols-2 gap-1.5 max-h-36 overflow-y-auto">
+                        {toppings.map(t => {
+                          const active = prodAllowedToppings.includes(t.id);
+                          return (
+                            <button key={t.id} type="button"
+                              onClick={() => setProdAllowedToppings(prev => prev.includes(t.id) ? prev.filter(x => x !== t.id) : [...prev, t.id])}
+                              className={`p-2.5 rounded-xl text-left text-xs transition-all border ${active ? 'border-amber-400 bg-amber-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                              <div className="flex items-center justify-between gap-1">
+                                <span className={`font-semibold truncate ${active ? 'text-amber-900' : 'text-slate-700'}`}>{t.name}</span>
+                                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${active ? 'border-amber-500 bg-amber-500' : 'border-slate-300'}`}>
+                                  {active && <Check className="w-2.5 h-2.5 text-white" />}
+                                </div>
+                              </div>
+                            </button>
                           );
                         })}
                       </div>
-
-                      <div className="p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 space-y-3">
-                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-wider">🏆 Puntos de Fidelización</p>
-                        <div className="grid grid-cols-2 gap-4 items-center">
-                          <div className="space-y-1">
-                            <label className="text-[11px] text-slate-500 font-medium">Puntos que otorga al comprar</label>
-                            <input type="number" min="0" value={prodPointsEarned} onChange={e => setProdPointsEarned(Number(e.target.value))} className="w-full px-4 py-2.5 rounded-xl border-2 border-white bg-white font-mono font-bold text-slate-800 focus:outline-none focus:border-amber-400 transition-colors shadow-sm" />
-                          </div>
-                          <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${prodPointsDiscountApplicable ? 'border-amber-300 bg-amber-50' : 'border-slate-100 bg-white'}`}>
-                            <div className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${prodPointsDiscountApplicable ? 'bg-amber-500' : 'bg-slate-200'}`}>
-                              <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodPointsDiscountApplicable ? 'translate-x-4' : 'translate-x-0.5'}`} />
-                              <input type="checkbox" checked={prodPointsDiscountApplicable} onChange={e => setProdPointsDiscountApplicable(e.target.checked)} className="sr-only" />
-                            </div>
-                            <span className="text-xs font-bold text-slate-700">Aplica descuento de puntos</span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* STEP 3: Toppings & Adiciones */}
-                  {prodFormStep === 3 && (
-                    <div className="space-y-5">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Toppings y Adiciones disponibles</label>
-                        <div className="flex bg-slate-100 p-1 rounded-2xl">
-                          <button type="button" onClick={() => { setProdToppingsRestricted(false); setProdAllowedToppings([]); }}
-                            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all ${!prodToppingsRestricted ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-                            ✅ Todos los toppings permitidos
-                          </button>
-                          <button type="button" onClick={() => setProdToppingsRestricted(true)}
-                            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all ${prodToppingsRestricted ? 'bg-white text-amber-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-                            🎯 Definir cuáles aplican
-                          </button>
-                        </div>
-                      </div>
-
-                      {!prodToppingsRestricted && (
-                        <div className="p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-100 text-center space-y-1">
-                          <p className="text-sm font-bold text-emerald-800">✅ Todos los toppings del catálogo disponibles</p>
-                          <p className="text-xs text-emerald-600">El cajero podrá ofrecer cualquier topping activo al preparar este granizado.</p>
-                        </div>
-                      )}
-
-                      {prodToppingsRestricted && (
-                        <div className="space-y-4">
-                          <p className="text-xs text-slate-500 font-medium">Marca los toppings que aplican para <strong>{prodName || 'este granizado'}</strong>:</p>
-                          {(['Salsas', 'Fruta picada', 'Gomitas & Dulces', 'Crocante & Lácteos'] as Topping['category'][]).map(cat => {
-                            const catToppings = toppings.filter(t => t.category === cat);
-                            if (!catToppings.length) return null;
-                            return (
-                              <div key={cat}>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                  <span className="h-px flex-1 bg-slate-100" />{cat}<span className="h-px flex-1 bg-slate-100" />
-                                </p>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {catToppings.map(t => {
-                                    const active = prodAllowedToppings.includes(t.id);
-                                    return (
-                                      <button key={t.id} type="button"
-                                        onClick={() => setProdAllowedToppings(prev => prev.includes(t.id) ? prev.filter(x => x !== t.id) : [...prev, t.id])}
-                                        className={`p-3 rounded-xl text-left text-xs transition-all border-2 ${active ? 'border-amber-400 bg-amber-50' : 'border-slate-100 bg-white hover:border-slate-200'}`}
-                                      >
-                                        <div className="flex items-start justify-between gap-2">
-                                          <span className={active ? 'font-bold text-amber-900' : 'font-medium text-slate-700'}>{t.name}</span>
-                                          <div className={`w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center transition-colors ${active ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300'}`}>
-                                            {active && <Check className="w-2.5 h-2.5" />}
-                                          </div>
-                                        </div>
-                                        <div className={`mt-1 font-mono text-[10px] ${active ? 'text-amber-700 font-bold' : 'text-slate-400'}`}>
-                                          +{formatMoney(t.price, config.currencySymbol)}
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            );
-                          })}
-                          {prodAllowedToppings.length > 0 && (
-                            <div className="p-3 rounded-2xl bg-amber-50 border border-amber-100 text-xs text-amber-700 font-medium">
-                              ✅ {prodAllowedToppings.length} topping{prodAllowedToppings.length > 1 ? 's' : ''} seleccionado{prodAllowedToppings.length > 1 ? 's' : ''}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
+                    )}
+                  </section>
                 </div>
               </div>
-
               {/* Footer */}
-              <div className="px-7 py-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0 bg-white">
-                <div className="flex gap-2">
-                  {prodFormStep > 1 && (
-                    <button type="button" onClick={() => setProdFormStep(s => (s - 1) as 1 | 2 | 3)} className="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 text-sm transition-colors">
-                      ← Anterior
-                    </button>
-                  )}
-                  <button type="button" onClick={() => setIsProductModalOpen(false)} className="px-5 py-2.5 rounded-xl font-bold text-slate-400 text-sm hover:text-slate-600 transition-colors">
-                    Cancelar
-                  </button>
-                </div>
-                {prodFormStep < 3 ? (
-                  <button type="button"
-                    onClick={() => { if (!prodName.trim()) { alert('Ingresa el nombre del producto primero'); return; } setProdFormStep(s => (s + 1) as 1 | 2 | 3); }}
-                    className="px-7 py-2.5 rounded-xl font-black text-white text-sm shadow-lg transition-all active:scale-[0.98]"
-                    style={{ background: 'linear-gradient(135deg,#f59e0b,#ea580c)', boxShadow: '0 6px 16px -4px rgba(245,158,11,0.45)' }}
-                  >
-                    Siguiente →
-                  </button>
-                ) : (
-                  <button type="submit" className="px-7 py-2.5 rounded-xl font-black text-white text-sm shadow-lg transition-all active:scale-[0.98]"
-                    style={{ background: 'linear-gradient(135deg,#10b981,#059669)', boxShadow: '0 6px 16px -4px rgba(16,185,129,0.45)' }}
-                  >
-                    {editingProductId ? '💾 Guardar Cambios' : '✨ Crear Producto'}
-                  </button>
-                )}
+              <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+                <button type="button" onClick={() => setIsProductModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-100 transition-all">
+                  Cancelar
+                </button>
+                <button type="submit"
+                  className="px-7 py-2.5 rounded-xl font-black text-white text-sm shadow-lg transition-all active:scale-[0.98]"
+                  style={{ background: 'linear-gradient(135deg,#f59e0b,#ea580c)', boxShadow: '0 6px 20px -4px rgba(245,158,11,0.5)' }}>
+                  {editingProductId ? '💾 Guardar Cambios' : '✨ Crear Producto'}
+                </button>
               </div>
             </form>
           </div>
@@ -1113,7 +963,7 @@ export const CatalogManager: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="ej. Gomitas Ácidas"
+                  placeholder="ej. Gomitas Ãcidas"
                   value={toppingName}
                   onChange={e => setToppingName(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200"
@@ -1121,7 +971,7 @@ export const CatalogManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Categoría</label>
+                <label className="font-bold text-slate-700 block mb-1">CategorÃ­a</label>
                 <select
                   value={toppingCategory}
                   onChange={e => setToppingCategory(e.target.value as Topping['category'])}
@@ -1130,7 +980,7 @@ export const CatalogManager: React.FC = () => {
                   <option value="Salsas">Salsas</option>
                   <option value="Fruta picada">Fruta picada</option>
                   <option value="Gomitas & Dulces">Gomitas & Dulces</option>
-                  <option value="Crocante & Lácteos">Crocante & Lácteos</option>
+                  <option value="Crocante & LÃ¡cteos">Crocante & LÃ¡cteos</option>
                 </select>
               </div>
 
@@ -1203,7 +1053,7 @@ export const CatalogManager: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Categoría</label>
+                  <label className="font-bold text-slate-700 block mb-1">CategorÃ­a</label>
                   <select
                     value={flavorCategory}
                     onChange={e => setFlavorCategory(e.target.value as Flavor['category'])}
