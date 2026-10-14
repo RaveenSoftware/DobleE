@@ -49,6 +49,7 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
     cashShift,
     openCashShift,
     closeCashShift,
+    tables,
   } = useApp();
 
   // Cash Register Opening State
@@ -442,6 +443,25 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onOrderCompleted }) => {
                     <button onClick={() => setLinkedCustomer(null)} className="text-[10px] font-bold text-emerald-600 hover:text-red-500">Quitar</button>
                   </div>
                 )}
+              </div>
+
+              {/* Table / Location Selector */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Ubicación / Mesa
+                </label>
+                <select
+                  value={assignedTable}
+                  onChange={e => setAssignedTable(e.target.value)}
+                  className="w-full text-xs font-bold py-2 px-3 rounded-xl border border-slate-200 outline-none focus:border-emerald-500 transition-colors bg-white text-slate-700"
+                >
+                  <option value="">🛍️ Para Llevar / Mostrador (Sin mesa)</option>
+                  {tables.filter(t => !t.isHidden).map(t => (
+                    <option key={t.id} value={t.name}>
+                      🪑 {t.name} ({t.area || 'Salón Principal'}) {t.status === 'ocupada' ? '• [Ocupada]' : '• [Libre]'}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Payment Methods — only shown in immediate mode */}

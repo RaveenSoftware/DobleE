@@ -175,31 +175,51 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
 
   // Helper to get active consumption / order for table
   const getTableOrderData = (table: TableItem) => {
-    // 1. Direct orderTotal if set on table
-    if (table.orderTotal && table.orderTotal > 0) {
+    // 0. If table is officially libre, it has no active order or balance
+    if (table.status === 'libre') {
       return {
-        total: table.orderTotal,
-        itemsCount: table.status === 'ocupada' ? 1 : 2,
-        orderId: table.currentOrderId,
+        total: 0,
+        itemsCount: 0,
+        orderId: undefined,
+        hasActiveOrder: false,
+        isPaid: true,
       };
     }
-    // 2. Search in orders array
-    const foundOrder = orders.find(
-      o => (o.id === table.currentOrderId || o.tableName === table.name) &&
+
+    // 1. Search in orders array for an active (non-delivered, non-canceled) order for this table
+    const activeOrder = orders.find(
+      o => (o.id === table.currentOrderId || (o.tableName && o.tableName.toLowerCase() === table.name.toLowerCase())) &&
         o.status !== 'Entregado' &&
         o.status !== 'Cancelado'
     );
-    if (foundOrder) {
+    if (activeOrder) {
+      const isPaid = activeOrder.paymentMethod !== 'Pendiente de Pago';
       return {
-        total: foundOrder.total,
-        itemsCount: foundOrder.items.reduce((s, i) => s + i.quantity, 0),
-        orderId: foundOrder.id,
+        total: activeOrder.total,
+        itemsCount: activeOrder.items.reduce((s, i) => s + i.quantity, 0),
+        orderId: activeOrder.id,
+        hasActiveOrder: true,
+        isPaid,
       };
     }
+
+    // 2. Direct orderTotal if set on table with occupied/cuenta status
+    if ((table.status === 'ocupada' || table.status === 'cuenta') && table.orderTotal && table.orderTotal > 0) {
+      return {
+        total: table.orderTotal,
+        itemsCount: 1,
+        orderId: table.currentOrderId,
+        hasActiveOrder: true,
+        isPaid: false,
+      };
+    }
+
     return {
       total: 0,
       itemsCount: 0,
       orderId: undefined,
+      hasActiveOrder: false,
+      isPaid: true,
     };
   };
 
@@ -277,9 +297,25 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
 
   // Open Checkout / Cobrar Modal
   const handleOpenCheckoutModal = (table: TableItem) => {
-    setTargetTableForCheckout(table);
     const orderData = getTableOrderData(table);
-    setCashAmountGiven(orderData.total > 0 ? orderData.total : 15000);
+    if (table.status === 'libre' || !orderData.hasActiveOrder) {
+      alert(`La ${table.name} está libre y no tiene consumos pendientes por cobrar.`);
+      return;
+    }
+    if (orderData.isPaid) {
+      if (confirm(`El pedido de la ${table.name} ya fue pagado en Caja.\n\n¿Deseas marcar la mesa como libre y finalizar el servicio?`)) {
+        updateTable(table.id, {
+          status: 'libre',
+          currentOrderId: undefined,
+          orderTotal: 0,
+          activeWaiter: undefined,
+          notes: undefined,
+        });
+      }
+      return;
+    }
+    setTargetTableForCheckout(table);
+    setCashAmountGiven(orderData.total > 0 ? orderData.total : 0);
     setIsCheckoutModalOpen(true);
   };
 
@@ -828,9 +864,29 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
                     </div>
 
                     {/* Full-width Amount Balance Pill */}
-                    <div className="bg-slate-100/80 rounded-xl py-1.5 px-3 flex items-center justify-center gap-1 text-xs font-bold text-slate-800 font-mono">
-                      <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{orderData.total > 0 ? formatMoney(orderData.total, config.currencySymbol) : '$ 0'}</span>
+                    <div className={`rounded-xl py-1.5 px-3 flex items-center justify-center gap-1 text-xs font-bold font-mono transition-colors ${
+                      orderData.hasActiveOrder && orderData.isPaid
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                        : orderData.hasActiveOrder && !orderData.isPaid
+                        ? 'bg-amber-50 text-amber-800 border border-amber-200/60'
+                        : 'bg-slate-100/80 text-slate-700'
+                    }`}>
+                      {orderData.hasActiveOrder && orderData.isPaid ? (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Pagado ({formatMoney(orderData.total, config.currencySymbol)})</span>
+                        </>
+                      ) : orderData.hasActiveOrder && !orderData.isPaid ? (
+                        <>
+                          <DollarSign className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Por Cobrar: {formatMoney(orderData.total, config.currencySymbol)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                          <span>$ 0</span>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -847,14 +903,51 @@ export const TablesManager: React.FC<TablesManagerProps> = ({ onViewOrderReceipt
                         <span>Pedido</span>
                       </button>
 
-                      {/* Cobrar Button (White with subtle border) */}
-                      <button
-                        onClick={() => handleOpenCheckoutModal(table)}
-                        className="bg-white hover:bg-slate-50 active:scale-95 border border-slate-200 text-slate-800 font-bold text-xs py-2 px-2.5 rounded-xl flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs"
-                      >
-                        <DollarSign className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Cobrar</span>
-                      </button>
+                      {/* Cobrar Button */}
+                      {table.status === 'libre' ? (
+                        <button
+                          disabled
+                          className="bg-slate-100 border border-slate-200/80 text-slate-400 font-bold text-xs py-2 px-2.5 rounded-xl flex items-center justify-center gap-1 cursor-not-allowed opacity-60"
+                          title="Mesa libre sin consumo pendiente"
+                        >
+                          <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Sin Cobro</span>
+                        </button>
+                      ) : !orderData.hasActiveOrder ? (
+                        <button
+                          onClick={() => {
+                            updateTable(table.id, {
+                              status: 'libre',
+                              currentOrderId: undefined,
+                              orderTotal: 0,
+                              activeWaiter: undefined,
+                              notes: undefined,
+                            });
+                          }}
+                          className="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold text-xs py-2 px-2.5 rounded-xl flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs"
+                          title="Mesa sin pedidos activos pendientes. Toca para marcar como Libre."
+                        >
+                          <RotateCcw className="w-3.5 h-3.5 text-rose-600" />
+                          <span>Liberar</span>
+                        </button>
+                      ) : orderData.isPaid ? (
+                        <button
+                          onClick={() => handleOpenCheckoutModal(table)}
+                          className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs py-2 px-2.5 rounded-xl flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs"
+                          title="Pedido pagado en Caja - Toca para liberar mesa"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Liberar</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleOpenCheckoutModal(table)}
+                          className="bg-white hover:bg-slate-50 active:scale-95 border border-amber-300 text-amber-900 font-bold text-xs py-2 px-2.5 rounded-xl flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs"
+                        >
+                          <DollarSign className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Cobrar</span>
+                        </button>
+                      )}
                     </div>
 
                     {/* Opciones Button (Light lavender / soft purple full-width) */}

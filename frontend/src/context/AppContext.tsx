@@ -699,13 +699,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // Update table status if set
-    if (orderData.tableName) {
+    if (orderData.tableName && orderData.tableName !== 'Sin mesa' && orderData.tableName !== 'none') {
+      const isDeferred = config.paymentMode === 'deferred' || orderData.paymentMethod === 'Pendiente de Pago';
       setTables(prev =>
-        prev.map(t =>
-          t.name.toLowerCase() === orderData.tableName?.toLowerCase()
-            ? { ...t, status: 'ocupada', currentOrderId: newOrder.id }
-            : t
-        )
+        prev.map(t => {
+          if (t.name.toLowerCase() === orderData.tableName?.toLowerCase()) {
+            const tableUpdates = {
+              status: 'ocupada' as const,
+              currentOrderId: newOrder.id,
+              orderTotal: isDeferred ? total : 0,
+              activeWaiter: orderData.waiterName || undefined,
+            };
+            api.apiUpdateTable(t.id, {
+              status: 'ocupada',
+              currentOrderId: newOrder.id,
+              orderTotal: tableUpdates.orderTotal,
+              activeWaiter: tableUpdates.activeWaiter || null,
+            }).catch(console.error);
+            return { ...t, ...tableUpdates };
+          }
+          return t;
+        })
       );
     }
 
@@ -734,18 +748,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     api.apiUpdateOrderStatus(orderId, newStatus).catch(console.error);
 
-    // If delivered or canceled, free the table
+    // If delivered or canceled, free the table both in React state and in backend database
     if (newStatus === 'Entregado' || newStatus === 'Cancelado') {
       const targetOrder = orders.find(o => o.id === orderId);
-      if (targetOrder?.tableName) {
-        setTables(prev =>
-          prev.map(t =>
-            t.name.toLowerCase() === targetOrder.tableName?.toLowerCase()
-              ? { ...t, status: 'libre', currentOrderId: undefined }
-              : t
-          )
-        );
-      }
+      const targetTableName = targetOrder?.tableName;
+
+      setTables(prev =>
+        prev.map(t => {
+          const matches =
+            (targetTableName && t.name.toLowerCase() === targetTableName.toLowerCase()) ||
+            t.currentOrderId === orderId;
+
+          if (matches) {
+            // Persist freed table to backend!
+            api.apiUpdateTable(t.id, {
+              status: 'libre',
+              currentOrderId: null,
+              orderTotal: 0,
+              activeWaiter: null,
+              notes: null,
+            }).catch(console.error);
+
+            return {
+              ...t,
+              status: 'libre' as const,
+              currentOrderId: undefined,
+              orderTotal: 0,
+              activeWaiter: undefined,
+              notes: undefined,
+            };
+          }
+          return t;
+        })
+      );
     }
   };
 
@@ -769,36 +804,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // If assigning to a valid table
     if (tableName && tableName !== 'Sin mesa' && tableName !== 'none') {
+      const isDeferred = targetOrder.paymentMethod === 'Pendiente de Pago';
       setTables(prev =>
         prev.map(t => {
           if (t.name.toLowerCase() === tableName.toLowerCase()) {
-            return {
-              ...t,
+            const updates = {
               status: 'ocupada' as const,
               currentOrderId: orderId,
-              orderTotal: targetOrder.total,
+              orderTotal: isDeferred ? targetOrder.total : 0,
             };
+            api.apiUpdateTable(t.id, {
+              status: 'ocupada',
+              currentOrderId: orderId,
+              orderTotal: updates.orderTotal,
+            }).catch(console.error);
+            return { ...t, ...updates };
           }
           // If table previously held this order, free it
           if (prevTableName && t.name.toLowerCase() === prevTableName.toLowerCase() && t.currentOrderId === orderId) {
+            api.apiUpdateTable(t.id, {
+              status: 'libre',
+              currentOrderId: null,
+              orderTotal: 0,
+              activeWaiter: null,
+            }).catch(console.error);
             return {
               ...t,
               status: 'libre' as const,
               currentOrderId: undefined,
               orderTotal: 0,
+              activeWaiter: undefined,
             };
           }
           return t;
         })
       );
     } else if (prevTableName) {
-      // Unassigned from table
+      // Unassigned from table - free previous table
       setTables(prev =>
-        prev.map(t =>
-          t.name.toLowerCase() === prevTableName.toLowerCase() && t.currentOrderId === orderId
-            ? { ...t, status: 'libre' as const, currentOrderId: undefined, orderTotal: 0 }
-            : t
-        )
+        prev.map(t => {
+          if (t.name.toLowerCase() === prevTableName.toLowerCase() && t.currentOrderId === orderId) {
+            api.apiUpdateTable(t.id, {
+              status: 'libre',
+              currentOrderId: null,
+              orderTotal: 0,
+              activeWaiter: null,
+            }).catch(console.error);
+            return {
+              ...t,
+              status: 'libre' as const,
+              currentOrderId: undefined,
+              orderTotal: 0,
+              activeWaiter: undefined,
+            };
+          }
+          return t;
+        })
       );
     }
   };

@@ -93,6 +93,23 @@ router.post('/', authenticate, async (req: Request & { user?: any }, res) => {
       }
     });
 
+    // If order was assigned to a table, update table status in database
+    if (tableName && tableName !== 'Sin mesa' && tableName !== 'none') {
+      try {
+        await prisma.tableItem.updateMany({
+          where: { branchId, name: String(tableName) },
+          data: {
+            status: 'ocupada',
+            currentOrderId: order.id,
+            orderTotal: calculatedTotal,
+            activeWaiter: waiterName || null,
+          },
+        });
+      } catch (tableErr) {
+        console.error('Error al sincronizar mesa en creación de orden:', tableErr);
+      }
+    }
+
     const user = (req as any).user;
     await logAudit({
       branchId,
@@ -121,6 +138,8 @@ router.put('/:id', authenticate, async (req, res) => {
     const { id } = req.params;
     const { status, tableName, tableId, waiterId, waiterName, notes } = req.body;
 
+    const currentOrder = await prisma.order.findUnique({ where: { id: String(id) } });
+
     const dataToUpdate: any = {};
     if (status !== undefined) dataToUpdate.status = status;
     if (tableName !== undefined) dataToUpdate.tableName = tableName;
@@ -133,6 +152,30 @@ router.put('/:id', authenticate, async (req, res) => {
       where: { id: id as string },
       data: dataToUpdate,
     });
+
+    // Handle table re-assignment or status change
+    if (tableName !== undefined && currentOrder && currentOrder.tableName !== tableName) {
+      if (currentOrder.tableName) {
+        await prisma.tableItem.updateMany({
+          where: { branchId: currentOrder.branchId, name: currentOrder.tableName },
+          data: { status: 'libre', currentOrderId: null, orderTotal: 0, activeWaiter: null },
+        }).catch(console.error);
+      }
+      if (tableName && tableName !== 'Sin mesa' && tableName !== 'none') {
+        await prisma.tableItem.updateMany({
+          where: { branchId: updated.branchId, name: String(tableName) },
+          data: { status: 'ocupada', currentOrderId: updated.id, orderTotal: updated.total, activeWaiter: updated.waiterName },
+        }).catch(console.error);
+      }
+    }
+
+    // Free table if status changed to Entregado or Cancelado
+    if ((status === 'Entregado' || status === 'Cancelado') && updated.tableName) {
+      await prisma.tableItem.updateMany({
+        where: { branchId: updated.branchId, name: updated.tableName },
+        data: { status: 'libre', currentOrderId: null, orderTotal: 0, activeWaiter: null },
+      }).catch(console.error);
+    }
 
     const user = (req as any).user;
     await logAudit({
@@ -163,6 +206,23 @@ router.put('/:id/status', authenticate, async (req, res) => {
       where: { id: req.params.id as string },
       data: { status }
     });
+
+    // If order was delivered or canceled, free associated table in database
+    if (status === 'Entregado' || status === 'Cancelado') {
+      if (order.tableName && order.tableName !== 'Sin mesa') {
+        await prisma.tableItem.updateMany({
+          where: { branchId: order.branchId, name: order.tableName },
+          data: { status: 'libre', currentOrderId: null, orderTotal: 0, activeWaiter: null }
+        }).catch(console.error);
+      }
+      if (order.tableId) {
+        await prisma.tableItem.update({
+          where: { id: order.tableId },
+          data: { status: 'libre', currentOrderId: null, orderTotal: 0, activeWaiter: null }
+        }).catch(console.error);
+      }
+    }
+
     res.json({
       ...order,
       items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items,
