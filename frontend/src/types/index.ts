@@ -22,6 +22,14 @@ export interface SizeOption {
   costModifier: number;
 }
 
+export interface ProductSize {
+  id: string;
+  label: string;   // e.g. "Pequeño"
+  oz: number;      // e.g. 12
+  price: number;
+  cost: number;
+}
+
 export interface GranizadoProduct {
   id: string;
   name: string;
@@ -33,11 +41,12 @@ export interface GranizadoProduct {
   isPopular?: boolean;
   isAvailable: boolean;
   defaultFlavors: string[];
-  allowedToppingIds?: string[];  // toppings habilitados para este producto (undefined = todos)
-  sizePrices?: {                 // precios/costos por tamaño
+  allowedToppingIds?: string[];
+  sizePrices?: {
     small?: { price: number; cost: number };
     large?: { price: number; cost: number };
   };
+  customSizes?: ProductSize[];  // tamaños personalizados definidos por el admin
   pointsEarned?: number;
   pointsDiscountApplicable?: boolean;
 }

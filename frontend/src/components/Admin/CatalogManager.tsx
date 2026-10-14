@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { GranizadoProduct, CategoryType, Topping, Flavor } from '../../types';
+import { GranizadoProduct, CategoryType, Topping, Flavor, ProductSize } from '../../types';
+
 import { formatMoney } from '../../utils/format';
 import {
   Plus,
@@ -57,21 +58,30 @@ export const CatalogManager: React.FC = () => {
   const [prodName, setProdName] = useState('');
   const [prodCategory, setProdCategory] = useState<CategoryType>('Frutales');
   const [prodDescription, setProdDescription] = useState('');
-  const [prodBasePrice, setProdBasePrice] = useState(8500);
-  const [prodBaseCost, setProdBaseCost] = useState(2800);
-  const [prodSmallPrice, setProdSmallPrice] = useState(6500);
-  const [prodSmallCost, setProdSmallCost] = useState(2200);
-  const [prodLargePrice, setProdLargePrice] = useState(11000);
-  const [prodLargeCost, setProdLargeCost] = useState(3800);
   const [prodImage, setProdImage] = useState(PRESET_IMAGES[0].url);
   const [prodIsPopular, setProdIsPopular] = useState(false);
   const [prodIsAvailable, setProdIsAvailable] = useState(true);
   const [prodFlavorsStr, setProdFlavorsStr] = useState('Mango Biche, Limón');
-  const [prodAllowedToppings, setProdAllowedToppings] = useState<string[]>([]);  // [] = all allowed
-  const [prodToppingsRestricted, setProdToppingsRestricted] = useState(false); // if false = all toppings allowed
+  const [prodAllowedToppings, setProdAllowedToppings] = useState<string[]>([]);
+  const [prodToppingsRestricted, setProdToppingsRestricted] = useState(false);
   const [prodPointsEarned, setProdPointsEarned] = useState<number>(85);
   const [prodPointsDiscountApplicable, setProdPointsDiscountApplicable] = useState(true);
   const [prodFormStep, setProdFormStep] = useState<1 | 2 | 3>(1);
+
+  // Custom sizes state (replaces hardcoded small/medium/large)
+  const defaultSizes: ProductSize[] = [
+    { id: 's1', label: 'Pequeño', oz: 12, price: 6500, cost: 2200 },
+    { id: 's2', label: 'Mediano', oz: 16, price: 8500, cost: 2800 },
+    { id: 's3', label: 'Grande', oz: 24, price: 11000, cost: 3800 },
+  ];
+  const [prodSizes, setProdSizes] = useState<ProductSize[]>(defaultSizes);
+
+
+  // Derived base price = medium (first size marked as base, or second)
+  const baseSize = prodSizes[1] ?? prodSizes[0];
+  const prodBasePrice = baseSize?.price ?? 8500;
+  const prodBaseCost = baseSize?.cost ?? 2800;
+
 
   const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,12 +109,11 @@ export const CatalogManager: React.FC = () => {
     setProdName('');
     setProdCategory('Frutales');
     setProdDescription('');
-    setProdBasePrice(8500);
-    setProdBaseCost(2800);
-    setProdSmallPrice(6500);
-    setProdSmallCost(2200);
-    setProdLargePrice(11000);
-    setProdLargeCost(3800);
+    setProdSizes([
+      { id: 's1', label: 'Pequeño', oz: 12, price: 6500, cost: 2200 },
+      { id: 's2', label: 'Mediano', oz: 16, price: 8500, cost: 2800 },
+      { id: 's3', label: 'Grande', oz: 24, price: 11000, cost: 3800 },
+    ]);
     setProdImage(PRESET_IMAGES[0].url);
     setProdIsPopular(false);
     setProdIsAvailable(true);
@@ -122,12 +131,16 @@ export const CatalogManager: React.FC = () => {
     setProdName(p.name);
     setProdCategory(p.category);
     setProdDescription(p.description);
-    setProdBasePrice(p.basePrice);
-    setProdBaseCost(p.baseCost);
-    setProdSmallPrice(p.sizePrices?.small?.price ?? Math.round(p.basePrice * 0.75));
-    setProdSmallCost(p.sizePrices?.small?.cost ?? Math.round(p.baseCost * 0.8));
-    setProdLargePrice(p.sizePrices?.large?.price ?? Math.round(p.basePrice * 1.3));
-    setProdLargeCost(p.sizePrices?.large?.cost ?? Math.round(p.baseCost * 1.35));
+    // Load customSizes if present, else build from legacy sizePrices
+    if (p.customSizes && p.customSizes.length > 0) {
+      setProdSizes(p.customSizes);
+    } else {
+      setProdSizes([
+        { id: 's1', label: 'Pequeño', oz: 12, price: p.sizePrices?.small?.price ?? Math.round(p.basePrice * 0.75), cost: p.sizePrices?.small?.cost ?? Math.round(p.baseCost * 0.8) },
+        { id: 's2', label: 'Mediano', oz: 16, price: p.basePrice, cost: p.baseCost },
+        { id: 's3', label: 'Grande', oz: 24, price: p.sizePrices?.large?.price ?? Math.round(p.basePrice * 1.3), cost: p.sizePrices?.large?.cost ?? Math.round(p.baseCost * 1.35) },
+      ]);
+    }
     setProdImage(p.image || PRESET_IMAGES[0].url);
     setProdIsPopular(p.isPopular || false);
     setProdIsAvailable(p.isAvailable);
@@ -143,22 +156,21 @@ export const CatalogManager: React.FC = () => {
 
   const handleSaveProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!prodName.trim()) return;
+    if (!prodName.trim() || prodSizes.length === 0) return;
 
-    const defaultFlavors = prodFlavorsStr
-      .split(',')
-      .map(s => s.trim())
-      .filter(Boolean);
+    const defaultFlavors = prodFlavorsStr.split(',').map(s => s.trim()).filter(Boolean);
+    const base = prodSizes[1] ?? prodSizes[0];
 
     const productData = {
       name: prodName.trim(),
       category: prodCategory,
       description: prodDescription.trim(),
-      basePrice: Number(prodBasePrice),
-      baseCost: Number(prodBaseCost),
+      basePrice: base.price,
+      baseCost: base.cost,
+      customSizes: prodSizes,
       sizePrices: {
-        small: { price: Number(prodSmallPrice), cost: Number(prodSmallCost) },
-        large: { price: Number(prodLargePrice), cost: Number(prodLargeCost) },
+        small: { price: prodSizes[0]?.price ?? base.price, cost: prodSizes[0]?.cost ?? base.cost },
+        large: { price: prodSizes[prodSizes.length - 1]?.price ?? base.price, cost: prodSizes[prodSizes.length - 1]?.cost ?? base.cost },
       },
       image: prodImage,
       isPopular: prodIsPopular,
@@ -396,113 +408,117 @@ export const CatalogManager: React.FC = () => {
       {activeTab === 'products' && (
         <>
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredProducts.map(p => {
                 const marginAmount = p.basePrice - p.baseCost;
                 const marginPercent = p.basePrice > 0 ? (marginAmount / p.basePrice) * 100 : 0;
+                const sizes = p.customSizes ?? [
+                  { label: 'Mediano', oz: 16, price: p.basePrice, cost: p.baseCost },
+                ];
 
                 return (
                   <div
                     key={p.id}
-                    className="bg-white rounded-2xl border border-slate-100 hover:border-amber-300 p-3.5 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between group space-y-3"
+                    className="bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-amber-200 shadow-xs hover:shadow-md transition-all group flex flex-col"
                   >
-                    <div>
-                      {/* Product Image Header with Quick Badges */}
-                      <div className="w-full h-36 rounded-xl overflow-hidden relative bg-slate-100">
-                        <img
-                          src={p.image}
-                          alt={p.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    {/* Full image hero */}
+                    <div className="relative w-full h-48 overflow-hidden bg-slate-100 shrink-0">
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
 
-                        {/* Top Badges */}
-                        <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-slate-900 shadow-2xs">
-                            {p.category}
+                      {/* Category badge top-left */}
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-xs text-slate-900 shadow">
+                          {p.category}
+                        </span>
+                        {p.isPopular && (
+                          <span className="text-[10px] font-bold px-1.5 py-1 rounded-lg bg-amber-500 text-white flex items-center gap-0.5 shadow">
+                            <Star className="w-2.5 h-2.5 fill-current" />
                           </span>
-
-                          {p.isPopular && (
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-500 text-white flex items-center gap-1 shadow-2xs">
-                              <Star className="w-3 h-3 fill-current" />
-                              <span>Estrella</span>
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Bottom Overlay Title & Availability */}
-                        <div className="absolute bottom-2 left-2 right-2 flex items-end justify-between text-white">
-                          <h4 className="text-xs font-bold font-display truncate leading-tight pr-2">
-                            {p.name}
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={() => toggleProductStock(p.id)}
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md cursor-pointer shrink-0 transition-colors ${
-                              p.isAvailable
-                                ? 'bg-emerald-500/90 text-white'
-                                : 'bg-rose-500/90 text-white'
-                            }`}
-                          >
-                            {p.isAvailable ? 'En Stock' : 'Agotado'}
-                          </button>
-                        </div>
+                        )}
                       </div>
 
-                      {/* Description & Flavors */}
-                      <p className="text-[11px] text-slate-500 line-clamp-2 mt-2 leading-relaxed">
-                        {p.description || 'Delicioso granizado artesanal preparado con hielo cristalino y pulpas naturales.'}
-                      </p>
-
-                      {p.defaultFlavors && p.defaultFlavors.length > 0 && (
-                        <div className="text-[10px] text-slate-400 mt-1 truncate">
-                          Sabores: <span className="text-slate-600 font-medium">{p.defaultFlavors.join(' · ')}</span>
-                        </div>
-                      )}
+                      {/* Name + stock bottom overlay */}
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between">
+                        <h4 className="text-sm font-black text-white leading-tight truncate pr-2">
+                          {p.name}
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => toggleProductStock(p.id)}
+                          className={`text-[10px] font-bold px-2.5 py-1 rounded-lg cursor-pointer shrink-0 transition-colors shadow ${
+                            p.isAvailable ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
+                          }`}
+                        >
+                          {p.isAvailable ? 'En Stock' : 'Agotado'}
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Financial Economics Strip & Actions */}
-                    <div className="pt-2.5 border-t border-slate-100 space-y-2">
-                      <div className="grid grid-cols-3 gap-1 bg-slate-50 p-2 rounded-xl text-center">
-                        <div>
-                          <span className="text-[9px] uppercase font-bold text-slate-400 block">Venta</span>
-                          <span className="font-mono text-xs font-black text-slate-900">
-                            {formatMoney(p.basePrice, config.currencySymbol)}
-                          </span>
+                    {/* Card body */}
+                    <div className="p-3.5 flex flex-col flex-1 space-y-2.5">
+                      {/* Description */}
+                      <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                        {p.description || 'Delicioso granizado artesanal preparado con hielo cristalino y pulpa 100% natural,...'}
+                      </p>
+
+                      {/* Flavors */}
+                      {p.defaultFlavors && p.defaultFlavors.length > 0 && (
+                        <div className="text-[10px] truncate">
+                          <span className="text-slate-400">Sabores: </span>
+                          <span className="text-slate-600 font-medium">{p.defaultFlavors.join(' · ')}</span>
                         </div>
-                        <div>
-                          <span className="text-[9px] uppercase font-bold text-slate-400 block">Costo</span>
-                          <span className="font-mono text-xs font-medium text-slate-600">
-                            {formatMoney(p.baseCost, config.currencySymbol)}
-                          </span>
+                      )}
+
+                      {/* VENTA / COSTO / MARGEN strip */}
+                      <div className="grid grid-cols-3 gap-0 bg-slate-50 rounded-xl overflow-hidden border border-slate-100">
+                        <div className="py-2 text-center border-r border-slate-100">
+                          <span className="text-[9px] uppercase font-black text-slate-400 block tracking-wide">Venta</span>
+                          <span className="font-mono text-[11px] font-black text-slate-900">{formatMoney(p.basePrice, config.currencySymbol)}</span>
                         </div>
-                        <div>
-                          <span className="text-[9px] uppercase font-bold text-emerald-600 block">Margen</span>
-                          <span className="font-mono text-xs font-bold text-emerald-600">
-                            {marginPercent.toFixed(0)}%
-                          </span>
+                        <div className="py-2 text-center border-r border-slate-100">
+                          <span className="text-[9px] uppercase font-black text-slate-400 block tracking-wide">Costo</span>
+                          <span className="font-mono text-[11px] font-medium text-slate-600">{formatMoney(p.baseCost, config.currencySymbol)}</span>
+                        </div>
+                        <div className="py-2 text-center">
+                          <span className="text-[9px] uppercase font-black text-emerald-600 block tracking-wide">Margen</span>
+                          <span className="font-mono text-[11px] font-black text-emerald-600">{marginPercent.toFixed(0)}%</span>
                         </div>
                       </div>
 
-                      {/* Buttons Edit & Delete */}
-                      <div className="flex items-center justify-between pt-1">
-                        <span className="text-[11px] text-emerald-600 font-medium">
+                      {/* Sizes chips (if custom) */}
+                      {p.customSizes && p.customSizes.length > 1 && (
+                        <div className="flex gap-1 flex-wrap">
+                          {p.customSizes.map((sz, i) => (
+                            <span key={sz.id} className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${i === 1 || (p.customSizes!.length === 1 && i === 0) ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
+                              {sz.label} {sz.oz}oz
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Profit + actions */}
+                      <div className="flex items-center justify-between pt-1 mt-auto">
+                        <span className="text-[11px] text-emerald-600 font-semibold">
                           +{formatMoney(marginAmount, config.currencySymbol)} / vaso
                         </span>
-
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-0.5">
                           <button
                             onClick={() => openEditProduct(p)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
-                            title="Editar producto"
+                            title="Editar"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDeleteProduct(p.id, p.name)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                            title="Eliminar producto"
+                            title="Eliminar"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -767,14 +783,47 @@ export const CatalogManager: React.FC = () => {
                         <p className="text-xs text-slate-500 text-center px-4">Sin imagen todavía</p>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-black/10 to-transparent" />
-                    {prodName && (
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">{prodCategory}</span>
-                        <h4 className="font-black text-white text-lg leading-tight mt-0.5">{prodName}</h4>
-                      </div>
-                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-black/10 to-transparent" />
+                    {/* Category badge top-left */}
+                    <div className="absolute top-3 left-3">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-xs text-slate-900 shadow">
+                        {prodCategory}
+                      </span>
+                    </div>
+                    {/* Name & stock bottom overlay */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+                      <h4 className="font-black text-white text-sm leading-tight pr-2 truncate">
+                        {prodName || 'Nombre del producto'}
+                      </h4>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${prodIsAvailable ? 'bg-emerald-500/90 text-white' : 'bg-rose-500/90 text-white'}`}>
+                        {prodIsAvailable ? 'En Stock' : 'Agotado'}
+                      </span>
+                    </div>
                   </div>
+                  {/* Mini card preview below */}
+                  <div className="p-3 space-y-2 bg-slate-800/80">
+                    <p className="text-[10px] text-white/40 line-clamp-2">
+                      {prodDescription || 'Descripción del granizado...'}
+                    </p>
+                    {prodFlavorsStr && (
+                      <p className="text-[10px] text-white/50 truncate">
+                        <span className="text-white/30">Sabores: </span>
+                        <span className="text-white/60 font-medium">{prodFlavorsStr.split(',').join(' · ')}</span>
+                      </p>
+                    )}
+                    {/* Sizes mini preview */}
+                    <div className="flex flex-wrap gap-1">
+                      {prodSizes.map((sz, i) => {
+                        const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
+                        return (
+                          <div key={sz.id} className={`px-2 py-1 rounded-lg text-[10px] font-bold ${i === 1 || (prodSizes.length === 1 && i === 0) ? 'bg-amber-500 text-white' : 'bg-white/10 text-white/70'}`}>
+                            {sz.label} {sz.oz}oz · {formatMoney(sz.price, config.currencySymbol)} ({margin.toFixed(0)}%)
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="p-4 space-y-3 shrink-0">
                     <label className="flex items-center gap-2.5 p-3 rounded-2xl border-2 border-dashed border-white/20 hover:border-amber-400/60 cursor-pointer transition-colors group">
                       <div className="w-8 h-8 rounded-xl bg-white/10 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
@@ -852,57 +901,91 @@ export const CatalogManager: React.FC = () => {
                     </div>
                   )}
 
-                  {/* STEP 2: Precios por tamaño */}
+                  {/* STEP 2: Tamaños personalizados */}
                   {prodFormStep === 2 && (
-                    <div className="space-y-5">
-                      <div className="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 text-xs text-blue-700 font-medium">
-                        💡 Define precio de venta y costo de insumos por cada tamaño. El margen se calcula en tiempo real.
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-black text-slate-800">Tamaños del Vaso</p>
+                          <p className="text-[11px] text-slate-400">Crea los tamaños que ofreces. El 2° se usa como precio base.</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setProdSizes(prev => [...prev, { id: `s${Date.now()}`, label: 'Nuevo', oz: 16, price: 8000, cost: 2500 }])}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" /> Agregar tamaño
+                        </button>
                       </div>
-                      {([
-                        { label: 'Pequeño', emoji: '🥤', sub: '12 oz', price: prodSmallPrice, cost: prodSmallCost, setPrice: setProdSmallPrice, setCost: setProdSmallCost },
-                        { label: 'Mediano', emoji: '🧃', sub: '16 oz', price: prodBasePrice, cost: prodBaseCost, setPrice: setProdBasePrice, setCost: setProdBaseCost, isBase: true },
-                        { label: 'Grande', emoji: '🍹', sub: '24 oz', price: prodLargePrice, cost: prodLargeCost, setPrice: setProdLargePrice, setCost: setProdLargeCost },
-                      ]).map(sz => {
-                        const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
-                        const mc = margin >= 60 ? 'text-emerald-600' : margin >= 40 ? 'text-amber-600' : 'text-rose-500';
-                        const bc = margin >= 60 ? 'bg-emerald-50 border-emerald-200' : margin >= 40 ? 'bg-amber-50/60 border-amber-200' : 'bg-rose-50 border-rose-200';
-                        return (
-                          <div key={sz.label} className={`p-5 rounded-2xl border-2 space-y-3 ${sz.isBase ? 'border-amber-200 bg-amber-50/40' : 'border-slate-100'}`}>
-                            <div className="flex items-center justify-between">
+
+                      <div className="space-y-3">
+                        {prodSizes.map((sz, idx) => {
+                          const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
+                          const mc = margin >= 60 ? 'text-emerald-600' : margin >= 40 ? 'text-amber-600' : 'text-rose-500';
+                          const isBase = idx === 1 || (prodSizes.length === 1 && idx === 0);
+                          return (
+                            <div key={sz.id} className={`p-4 rounded-2xl border-2 space-y-3 ${isBase ? 'border-amber-300 bg-amber-50/40' : 'border-slate-100 bg-slate-50/50'}`}>
                               <div className="flex items-center gap-2">
-                                <span className="text-2xl">{sz.emoji}</span>
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-black text-slate-800">{sz.label}</span>
-                                    {sz.isBase && <span className="text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full">BASE</span>}
-                                  </div>
-                                  <span className="text-[10px] text-slate-400">{sz.sub}</span>
+                                {/* Name & oz */}
+                                <input
+                                  type="text"
+                                  value={sz.label}
+                                  onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
+                                  placeholder="Nombre"
+                                  className="flex-1 px-3 py-2 text-sm font-bold rounded-xl border-2 border-slate-200 bg-white focus:outline-none focus:border-amber-400"
+                                />
+                                <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl px-2 py-2">
+                                  <input
+                                    type="number"
+                                    value={sz.oz}
+                                    min={4}
+                                    onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, oz: Number(e.target.value) } : s))}
+                                    className="w-10 text-sm font-mono font-bold text-center outline-none bg-transparent"
+                                  />
+                                  <span className="text-[10px] text-slate-400 font-bold">oz</span>
+                                </div>
+                                {isBase && <span className="text-[10px] bg-amber-400 text-white font-bold px-2 py-0.5 rounded-full shrink-0">BASE</span>}
+                                {prodSizes.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setProdSizes(prev => prev.filter((_, i) => i !== idx))}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                              <div className="grid grid-cols-3 gap-2 items-center">
+                                <div className="relative">
+                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">$</span>
+                                  <input
+                                    type="number" min="0" step="100"
+                                    value={sz.price}
+                                    onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, price: Number(e.target.value) } : s))}
+                                    className="w-full pl-6 pr-2 py-2 rounded-xl border-2 border-slate-200 bg-white font-mono font-bold text-sm text-slate-800 focus:outline-none focus:border-emerald-400"
+                                  />
+                                  <span className="absolute right-2 bottom-1 text-[9px] text-slate-400">Venta</span>
+                                </div>
+                                <div className="relative">
+                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">$</span>
+                                  <input
+                                    type="number" min="0" step="100"
+                                    value={sz.cost}
+                                    onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, cost: Number(e.target.value) } : s))}
+                                    className="w-full pl-6 pr-2 py-2 rounded-xl border-2 border-slate-200 bg-white font-mono font-bold text-sm text-slate-800 focus:outline-none focus:border-amber-400"
+                                  />
+                                  <span className="absolute right-2 bottom-1 text-[9px] text-slate-400">Costo</span>
+                                </div>
+                                <div className={`text-center py-2 rounded-xl font-black text-lg ${mc}`}>
+                                  {margin.toFixed(0)}%
+                                  <p className="text-[9px] font-normal text-slate-400">margen</p>
                                 </div>
                               </div>
-                              <div className="text-right">
-                                <span className={`text-2xl font-black font-mono ${mc}`}>{margin.toFixed(0)}%</span>
-                                <p className="text-[10px] text-slate-400">margen bruto</p>
-                              </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="relative">
-                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                                <input type="number" required min="0" step="100" value={sz.price} onChange={e => sz.setPrice(Number(e.target.value))} className="w-full pl-8 pr-3 py-3 rounded-xl border-2 border-slate-100 bg-white font-mono font-bold text-slate-800 focus:outline-none focus:border-amber-400 transition-colors" />
-                                <span className="absolute right-3 bottom-1.5 text-[9px] text-slate-400">Precio Venta</span>
-                              </div>
-                              <div className="relative">
-                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                                <input type="number" required min="0" step="100" value={sz.cost} onChange={e => sz.setCost(Number(e.target.value))} className="w-full pl-8 pr-3 py-3 rounded-xl border-2 border-slate-100 bg-white font-mono font-bold text-slate-800 focus:outline-none focus:border-amber-400 transition-colors" />
-                                <span className="absolute right-3 bottom-1.5 text-[9px] text-slate-400">Costo Insumos</span>
-                              </div>
-                            </div>
-                            <div className={`flex items-center justify-between p-2.5 rounded-xl text-xs ${bc} border`}>
-                              <span className="text-slate-600 font-medium">Ganancia neta por vaso:</span>
-                              <span className={`font-black font-mono ${mc}`}>{formatMoney(sz.price - sz.cost, config.currencySymbol)}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
+
                       <div className="p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 space-y-3">
                         <p className="text-[10px] font-black text-slate-600 uppercase tracking-wider">🏆 Puntos de Fidelización</p>
                         <div className="grid grid-cols-2 gap-4 items-center">
