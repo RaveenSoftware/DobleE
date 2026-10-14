@@ -770,83 +770,70 @@ export const CatalogManager: React.FC = () => {
             <form onSubmit={handleSaveProduct} className="flex flex-col flex-1 min-h-0">
               <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
 
-                {/* Left: Live Image Preview + Upload */}
-                <div className="lg:w-64 xl:w-72 shrink-0 bg-slate-900 flex flex-col overflow-hidden">
-                  <div className="relative flex-1" style={{ minHeight: '200px' }}>
+                {/* Left: Live Card Preview */}
+                <div className="lg:w-60 xl:w-68 shrink-0 bg-slate-950 flex flex-col overflow-hidden">
+
+                  {/* Card preview — mimics the real product card */}
+                  <div className="relative w-full flex-1 min-h-0" style={{ minHeight: '220px' }}>
                     {prodImage ? (
                       <img src={prodImage} alt="Preview" className="absolute inset-0 w-full h-full object-cover" key={prodImage.substring(0, 30)} />
                     ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                        <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center">
-                          <ImageIcon className="w-8 h-8 text-slate-500" />
-                        </div>
-                        <p className="text-xs text-slate-500 text-center px-4">Sin imagen todavía</p>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-800">
+                        <ImageIcon className="w-10 h-10 text-slate-600" />
+                        <p className="text-[11px] text-slate-500 text-center">Sin imagen</p>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-black/10 to-transparent" />
-                    {/* Category badge top-left */}
-                    <div className="absolute top-3 left-3">
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-xs text-slate-900 shadow">
-                        {prodCategory}
-                      </span>
-                    </div>
-                    {/* Name & stock bottom overlay */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
-                      <h4 className="font-black text-white text-sm leading-tight pr-2 truncate">
-                        {prodName || 'Nombre del producto'}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20" />
+                    {/* Category top-left */}
+                    <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/90 text-slate-900">
+                      {prodCategory}
+                    </span>
+                    {/* Name + stock bottom */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
+                      <h4 className="text-sm font-black text-white leading-tight truncate">
+                        {prodName || <span className="text-white/30 font-normal italic">Nombre...</span>}
                       </h4>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${prodIsAvailable ? 'bg-emerald-500/90 text-white' : 'bg-rose-500/90 text-white'}`}>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md shrink-0 ${prodIsAvailable ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
                         {prodIsAvailable ? 'En Stock' : 'Agotado'}
                       </span>
                     </div>
                   </div>
-                  {/* Mini card preview below */}
-                  <div className="p-3 space-y-2 bg-slate-800/80">
-                    <p className="text-[10px] text-white/40 line-clamp-2">
-                      {prodDescription || 'Descripción del granizado...'}
+
+                  {/* Compact description + flavors preview */}
+                  <div className="px-3 pt-2.5 pb-1.5 space-y-1 border-b border-white/5">
+                    <p className="text-[10px] text-white/35 line-clamp-2 leading-relaxed">
+                      {prodDescription || 'Descripción del producto...'}
                     </p>
                     {prodFlavorsStr && (
-                      <p className="text-[10px] text-white/50 truncate">
-                        <span className="text-white/30">Sabores: </span>
-                        <span className="text-white/60 font-medium">{prodFlavorsStr.split(',').join(' · ')}</span>
+                      <p className="text-[10px] text-white/30 truncate">
+                        <span className="text-white/20">Sabores: </span>
+                        <span className="text-white/45">{prodFlavorsStr.split(',').map(s => s.trim()).join(' · ')}</span>
                       </p>
                     )}
-                    {/* Sizes mini preview */}
-                    <div className="flex flex-wrap gap-1">
-                      {prodSizes.map((sz, i) => {
-                        const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
-                        return (
-                          <div key={sz.id} className={`px-2 py-1 rounded-lg text-[10px] font-bold ${i === 1 || (prodSizes.length === 1 && i === 0) ? 'bg-amber-500 text-white' : 'bg-white/10 text-white/70'}`}>
-                            {sz.label} {sz.oz}oz · {formatMoney(sz.price, config.currencySymbol)} ({margin.toFixed(0)}%)
-                          </div>
-                        );
-                      })}
-                    </div>
                   </div>
 
-                  <div className="p-4 space-y-3 shrink-0">
-                    <label className="flex items-center gap-2.5 p-3 rounded-2xl border-2 border-dashed border-white/20 hover:border-amber-400/60 cursor-pointer transition-colors group">
-                      <div className="w-8 h-8 rounded-xl bg-white/10 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
-                        <ImageIcon className="w-4 h-4 text-white/60 group-hover:text-amber-400 transition-colors" />
+                  {/* Image upload area */}
+                  <div className="p-3 space-y-2.5">
+                    <label className="flex items-center gap-2.5 p-2.5 rounded-xl border border-dashed border-white/15 hover:border-amber-400/50 cursor-pointer transition-colors group">
+                      <div className="w-7 h-7 rounded-lg bg-white/8 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
+                        <ImageIcon className="w-3.5 h-3.5 text-white/40 group-hover:text-amber-400 transition-colors" />
                       </div>
-                      <div>
-                        <span className="text-xs font-bold text-white/80 block">Subir desde dispositivo</span>
-                        <span className="text-[10px] text-white/40">JPG, PNG, WEBP</span>
+                      <div className="min-w-0">
+                        <span className="text-[11px] font-semibold text-white/60 block leading-tight">Subir imagen</span>
+                        <span className="text-[10px] text-white/25">JPG, PNG, WEBP</span>
                       </div>
                       <input type="file" accept="image/*" className="sr-only" onChange={handleImageFileUpload} />
                     </label>
-                    <div>
-                      <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Fotos rápidas</p>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {PRESET_IMAGES.map(preset => (
-                          <button key={preset.url} type="button" onClick={() => setProdImage(preset.url)}
-                            className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${prodImage === preset.url ? 'border-amber-500 scale-105' : 'border-white/10 opacity-50 hover:opacity-100 hover:border-white/30'}`}
-                          >
-                            <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
-                            {prodImage === preset.url && <div className="absolute inset-0 bg-amber-500/30 flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
-                          </button>
-                        ))}
-                      </div>
+                    {/* Quick photos */}
+                    <div className="grid grid-cols-4 gap-1">
+                      {PRESET_IMAGES.map(preset => (
+                        <button key={preset.url} type="button" onClick={() => setProdImage(preset.url)}
+                          className={`relative rounded-lg overflow-hidden aspect-square border transition-all ${prodImage === preset.url ? 'border-amber-500 opacity-100' : 'border-white/10 opacity-40 hover:opacity-80'}`}
+                        >
+                          <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
+                          {prodImage === preset.url && <div className="absolute inset-0 bg-amber-500/25 flex items-center justify-center"><Check className="w-2.5 h-2.5 text-white" /></div>}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
