@@ -733,141 +733,222 @@ export const CatalogManager: React.FC = () => {
       )}
 
 
-      {/* MODAL: CREATE / EDIT PRODUCT — Right Drawer */}
+      {/* MODAL: CREATE / EDIT PRODUCT */}
       {isProductModalOpen && (
         <div
           className="fixed inset-0 z-50 flex justify-end"
-          style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(6px)' }}
+          style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(8px)' }}
           onClick={e => { if (e.target === e.currentTarget) setIsProductModalOpen(false); }}
         >
-          <div className="bg-white h-full flex flex-col shadow-2xl overflow-hidden" style={{ width: '100%', maxWidth: '500px' }}>
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
+          <div
+            className="bg-white h-full flex flex-col shadow-2xl"
+            style={{ width: '100%', maxWidth: '480px', borderLeft: '1px solid #f1f5f9' }}
+          >
+            {/* ─── HEADER ─── */}
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 shrink-0" style={{ borderBottom: '1px solid #f1f5f9' }}>
               <div>
-                <h3 className="text-sm font-black text-slate-900">{editingProductId ? 'Editar Producto' : 'Nuevo Granizado'}</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">Completa los campos y guarda</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-amber-500 mb-0.5">
+                  {editingProductId ? 'Editando' : 'Catálogo'}
+                </p>
+                <h2 className="text-lg font-black text-slate-900 leading-none">
+                  {editingProductId ? 'Editar Producto' : 'Nuevo Granizado'}
+                </h2>
               </div>
-              <button onClick={() => setIsProductModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+              <button
+                onClick={() => setIsProductModalOpen(false)}
+                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
+
             <form onSubmit={handleSaveProduct} className="flex flex-col flex-1 min-h-0">
-              <div className="flex-1 overflow-y-auto">
-                {/* Live preview */}
-                <div className="relative h-48 bg-slate-100 overflow-hidden shrink-0">
+              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+
+                {/* ─── HERO IMAGE PREVIEW ─── */}
+                <div className="relative overflow-hidden" style={{ height: '220px', background: '#0f172a' }}>
                   {prodImage
-                    ? <img src={prodImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    : <div className="absolute inset-0 flex items-center justify-center"><ImageIcon className="w-10 h-10 text-slate-300" /></div>
+                    ? <img src={prodImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-90" />
+                    : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg,#1e293b,#334155)' }}>
+                        <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center">
+                          <ImageIcon className="w-7 h-7 text-white/40" />
+                        </div>
+                        <p className="text-white/30 text-xs font-medium">Sin imagen — elige abajo</p>
+                      </div>
+                    )
                   }
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
-                  <span className="absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white/95 text-slate-800">{prodCategory}</span>
-                  {prodIsPopular && <span className="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-amber-500 text-white flex items-center gap-1"><Star className="w-3 h-3 fill-current"/>Estrella</span>}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-                    <p className="text-white font-black text-sm leading-tight truncate">
-                      {prodName || <span className="font-normal opacity-30 italic">Nombre del producto</span>}
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.25) 100%)' }} />
+                  {/* Category pill */}
+                  <span className="absolute top-4 left-4 text-[11px] font-bold px-3 py-1 rounded-full bg-white text-slate-800 shadow-lg">
+                    {prodCategory}
+                  </span>
+                  {/* Popular badge */}
+                  {prodIsPopular && (
+                    <span className="absolute top-4 right-4 text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500 text-white flex items-center gap-1 shadow-lg">
+                      <Star className="w-3 h-3 fill-current" /> Estrella
+                    </span>
+                  )}
+                  {/* Name + stock */}
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+                    <p className="text-white font-black text-xl leading-tight flex-1 truncate drop-shadow-lg">
+                      {prodName || <span className="text-white/25 font-normal text-base italic">Nombre del producto</span>}
                     </p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg shrink-0 ${prodIsAvailable ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+                    <span className={`text-[11px] font-bold px-3 py-1 rounded-full shrink-0 shadow-lg ${prodIsAvailable ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
                       {prodIsAvailable ? 'En Stock' : 'Agotado'}
                     </span>
                   </div>
                 </div>
-                <div className="p-5 space-y-5">
-                  {/* Imagen */}
-                  <section className="space-y-2">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Imagen</p>
-                    <div className="flex gap-2">
-                      <label className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 cursor-pointer transition-colors group">
-                        <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-amber-50 flex items-center justify-center shrink-0 transition-colors">
-                          <ImageIcon className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-500 transition-colors" />
-                        </div>
-                        <div>
-                          <span className="text-xs font-semibold text-slate-700 block leading-tight">Subir imagen</span>
-                          <span className="text-[10px] text-slate-400">JPG, PNG, WEBP</span>
-                        </div>
-                        <input type="file" accept="image/*" className="sr-only" onChange={handleImageFileUpload} />
-                      </label>
-                      <div className="flex gap-1">
-                        {PRESET_IMAGES.map(preset => (
-                          <button key={preset.url} type="button" onClick={() => setProdImage(preset.url)}
-                            className={`relative w-11 h-11 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${prodImage === preset.url ? 'border-amber-500' : 'border-slate-200 opacity-50 hover:opacity-100'}`}
-                          >
-                            <img src={preset.url} alt="" className="w-full h-full object-cover" />
-                            {prodImage === preset.url && <div className="absolute inset-0 bg-amber-500/25 flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
-                          </button>
-                        ))}
-                      </div>
+
+                {/* ─── IMAGE PICKER ─── */}
+                <div className="px-6 py-4 flex items-center gap-3" style={{ borderBottom: '1px solid #f8fafc', background: '#fafafa' }}>
+                  <label className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl cursor-pointer transition-all group flex-shrink-0" style={{ border: '1.5px dashed #cbd5e1', background: 'white' }}>
+                    <div className="w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
+                      <ImageIcon className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-500 transition-colors" />
                     </div>
-                  </section>
-                  {/* Info */}
-                  <section className="space-y-2.5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Información</p>
-                    <input type="text" required value={prodName} onChange={e => setProdName(e.target.value)} placeholder="Nombre del granizado *"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm font-bold text-slate-800 focus:outline-none focus:border-amber-400 transition-all" />
-                    <div className="grid grid-cols-2 gap-2">
+                    <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition-colors whitespace-nowrap">Subir foto</span>
+                    <input type="file" accept="image/*" className="sr-only" onChange={handleImageFileUpload} />
+                  </label>
+                  <div className="flex gap-2 flex-1 overflow-hidden">
+                    {PRESET_IMAGES.map(preset => (
+                      <button key={preset.url} type="button" onClick={() => setProdImage(preset.url)}
+                        className={`relative rounded-xl overflow-hidden flex-shrink-0 transition-all ${prodImage === preset.url ? 'ring-2 ring-amber-500 ring-offset-1 scale-105' : 'opacity-60 hover:opacity-100'}`}
+                        style={{ width: '44px', height: '44px' }}
+                      >
+                        <img src={preset.url} alt="" className="w-full h-full object-cover" />
+                        {prodImage === preset.url && <div className="absolute inset-0 bg-amber-500/20 flex items-center justify-center"><Check className="w-3.5 h-3.5 text-white drop-shadow" /></div>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="px-6 py-6 space-y-7">
+
+                  {/* ─── INFORMACIÓN ─── */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Información</p>
+
+                    <input
+                      type="text" required
+                      value={prodName} onChange={e => setProdName(e.target.value)}
+                      placeholder="Nombre del granizado *"
+                      className="w-full px-4 py-3.5 rounded-2xl text-sm font-bold text-slate-800 placeholder:font-normal placeholder:text-slate-400 focus:outline-none transition-all"
+                      style={{ border: '1.5px solid #e2e8f0', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                      onFocus={e => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.12)'; }}
+                      onBlur={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
+                    />
+
+                    <div className="grid grid-cols-2 gap-3">
                       <select value={prodCategory} onChange={e => setProdCategory(e.target.value as CategoryType)}
-                        className="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm text-slate-700 font-medium focus:outline-none focus:border-amber-400 transition-all">
+                        className="px-4 py-3 rounded-2xl text-sm text-slate-700 font-medium focus:outline-none transition-all"
+                        style={{ border: '1.5px solid #e2e8f0', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                         {dynamicCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         {!dynamicCategories.includes(prodCategory) && prodCategory && <option value={prodCategory}>{prodCategory}</option>}
                       </select>
-                      <input type="text" value={prodFlavorsStr} onChange={e => setProdFlavorsStr(e.target.value)} placeholder="Sabores (por coma)"
-                        className="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm text-slate-700 focus:outline-none focus:border-amber-400 transition-all" />
+                      <input type="text" value={prodFlavorsStr} onChange={e => setProdFlavorsStr(e.target.value)}
+                        placeholder="Sabores (por coma)"
+                        className="px-4 py-3 rounded-2xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none transition-all"
+                        style={{ border: '1.5px solid #e2e8f0', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.12)'; }}
+                        onBlur={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
+                      />
                     </div>
-                    <textarea rows={2} value={prodDescription} onChange={e => setProdDescription(e.target.value)} placeholder="Descripción breve..."
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm text-slate-700 focus:outline-none focus:border-amber-400 transition-all resize-none" />
-                    <div className="flex gap-2">
-                      <label className={`flex-1 flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${prodIsPopular ? 'border-amber-300 bg-amber-50' : 'border-slate-200 hover:border-slate-300'}`}>
-                        <div className={`w-8 h-5 rounded-full relative transition-colors shrink-0 ${prodIsPopular ? 'bg-amber-500' : 'bg-slate-200'}`}>
-                          <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodIsPopular ? 'translate-x-3' : 'translate-x-0.5'}`} />
+
+                    <textarea rows={2} value={prodDescription} onChange={e => setProdDescription(e.target.value)}
+                      placeholder="Descripción breve del granizado..."
+                      className="w-full px-4 py-3 rounded-2xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none transition-all resize-none"
+                      style={{ border: '1.5px solid #e2e8f0', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                      onFocus={e => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.12)'; }}
+                      onBlur={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
+                    />
+
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Estrella toggle */}
+                      <label className={`flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer transition-all select-none ${prodIsPopular ? 'bg-amber-50' : 'bg-white hover:bg-slate-50'}`}
+                        style={{ border: `1.5px solid ${prodIsPopular ? '#fcd34d' : '#e2e8f0'}` }}>
+                        <div className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${prodIsPopular ? 'bg-amber-400' : 'bg-slate-200'}`}>
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodIsPopular ? 'translate-x-5' : 'translate-x-1'}`} />
                           <input type="checkbox" checked={prodIsPopular} onChange={e => setProdIsPopular(e.target.checked)} className="sr-only" />
                         </div>
-                        <span className="text-xs font-semibold text-slate-700">⭐ Estrella</span>
+                        <span className={`text-xs font-semibold ${prodIsPopular ? 'text-amber-800' : 'text-slate-600'}`}>⭐ Estrella</span>
                       </label>
-                      <label className={`flex-1 flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${prodIsAvailable ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
-                        <div className={`w-8 h-5 rounded-full relative transition-colors shrink-0 ${prodIsAvailable ? 'bg-emerald-500' : 'bg-slate-200'}`}>
-                          <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodIsAvailable ? 'translate-x-3' : 'translate-x-0.5'}`} />
+                      {/* Disponible toggle */}
+                      <label className={`flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer transition-all select-none ${prodIsAvailable ? 'bg-emerald-50' : 'bg-white hover:bg-slate-50'}`}
+                        style={{ border: `1.5px solid ${prodIsAvailable ? '#6ee7b7' : '#e2e8f0'}` }}>
+                        <div className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${prodIsAvailable ? 'bg-emerald-500' : 'bg-slate-200'}`}>
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodIsAvailable ? 'translate-x-5' : 'translate-x-1'}`} />
                           <input type="checkbox" checked={prodIsAvailable} onChange={e => setProdIsAvailable(e.target.checked)} className="sr-only" />
                         </div>
-                        <span className="text-xs font-semibold text-slate-700">🟢 Disponible</span>
+                        <span className={`text-xs font-semibold ${prodIsAvailable ? 'text-emerald-800' : 'text-slate-600'}`}>🟢 Disponible</span>
                       </label>
                     </div>
-                  </section>
-                  {/* Tamaños */}
-                  <section className="space-y-2">
+                  </div>
+
+                  {/* ─── TAMAÑOS ─── */}
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tamaños del vaso</p>
-                      <button type="button" onClick={() => setProdSizes(prev => [...prev, { id: `s${Date.now()}`, label: 'Nuevo', oz: 16, price: 8000, cost: 2500 }])}
-                        className="flex items-center gap-1 text-[11px] font-bold text-amber-600 hover:text-amber-700">
+                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Tamaños del vaso</p>
+                      <button type="button"
+                        onClick={() => setProdSizes(prev => [...prev, { id: `s${Date.now()}`, label: 'Nuevo', oz: 16, price: 8000, cost: 2500 }])}
+                        className="flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
                         <Plus className="w-3.5 h-3.5" /> Agregar
                       </button>
                     </div>
-                    <div className="grid text-[10px] font-bold text-slate-400 px-1" style={{ gridTemplateColumns: '1fr 48px 80px 80px 44px' }}>
-                      <span>Nombre</span><span className="text-center">Oz</span><span className="text-center">Venta</span><span className="text-center">Costo</span><span className="text-center">Mg</span>
+
+                    {/* Column headers */}
+                    <div className="grid px-3 text-[10px] font-black uppercase text-slate-400 tracking-wide" style={{ gridTemplateColumns: '1fr 52px 76px 76px 52px' }}>
+                      <span>Nombre</span>
+                      <span className="text-center">Oz</span>
+                      <span className="text-center">Venta</span>
+                      <span className="text-center">Costo</span>
+                      <span className="text-center">Mg</span>
                     </div>
-                    <div className="space-y-1.5">
+
+                    <div className="space-y-2">
                       {prodSizes.map((sz, idx) => {
                         const margin = sz.price > 0 ? ((sz.price - sz.cost) / sz.price) * 100 : 0;
                         const isBase = idx === 1 || (prodSizes.length === 1 && idx === 0);
-                        const mgColor = margin >= 60 ? 'text-emerald-600' : margin >= 40 ? 'text-amber-600' : 'text-rose-500';
+                        const mgColor = margin >= 60 ? '#10b981' : margin >= 40 ? '#f59e0b' : '#ef4444';
                         return (
-                          <div key={sz.id} className={`grid items-center gap-1 p-2 rounded-xl ${isBase ? 'bg-amber-50 border border-amber-200' : 'bg-slate-50 border border-slate-100'}`} style={{ gridTemplateColumns: '1fr 48px 80px 80px 44px' }}>
-                            <input type="text" value={sz.label} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
-                              className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-400 w-full" />
-                            <input type="number" min={4} value={sz.oz} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, oz: Number(e.target.value) } : s))}
-                              className="px-1 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-center focus:outline-none focus:border-amber-400 w-full" />
+                          <div key={sz.id}
+                            className="grid items-center gap-1.5 px-3 py-2.5 rounded-2xl transition-all"
+                            style={{
+                              gridTemplateColumns: '1fr 52px 76px 76px 52px',
+                              border: isBase ? '1.5px solid #fcd34d' : '1.5px solid #f1f5f9',
+                              background: isBase ? '#fffbeb' : 'white',
+                              boxShadow: isBase ? '0 2px 8px rgba(245,158,11,0.1)' : '0 1px 3px rgba(0,0,0,0.03)',
+                            }}
+                          >
+                            <input type="text" value={sz.label}
+                              onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, label: e.target.value } : s))}
+                              className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-800 focus:outline-none w-full"
+                              style={{ border: '1px solid #e2e8f0', background: 'white' }}
+                            />
+                            <input type="number" min={4} value={sz.oz}
+                              onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, oz: Number(e.target.value) } : s))}
+                              className="px-1 py-1.5 rounded-xl text-xs font-mono font-bold text-center focus:outline-none w-full"
+                              style={{ border: '1px solid #e2e8f0', background: 'white' }}
+                            />
                             <div className="relative">
-                              <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">$</span>
-                              <input type="number" min={0} step={100} value={sz.price} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, price: Number(e.target.value) } : s))}
-                                className="pl-4 pr-1 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold focus:outline-none focus:border-emerald-400 w-full" />
+                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] font-bold">$</span>
+                              <input type="number" min={0} step={100} value={sz.price}
+                                onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, price: Number(e.target.value) } : s))}
+                                className="pl-4 pr-1 py-1.5 rounded-xl text-xs font-mono font-bold focus:outline-none w-full"
+                                style={{ border: '1px solid #e2e8f0', background: 'white' }}
+                              />
                             </div>
                             <div className="relative">
-                              <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">$</span>
-                              <input type="number" min={0} step={100} value={sz.cost} onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, cost: Number(e.target.value) } : s))}
-                                className="pl-4 pr-1 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold focus:outline-none focus:border-amber-400 w-full" />
+                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] font-bold">$</span>
+                              <input type="number" min={0} step={100} value={sz.cost}
+                                onChange={e => setProdSizes(prev => prev.map((s, i) => i === idx ? { ...s, cost: Number(e.target.value) } : s))}
+                                className="pl-4 pr-1 py-1.5 rounded-xl text-xs font-mono font-bold focus:outline-none w-full"
+                                style={{ border: '1px solid #e2e8f0', background: 'white' }}
+                              />
                             </div>
-                            <div className={`text-center text-xs font-black ${mgColor}`}>
-                              {margin.toFixed(0)}%
+                            <div className="text-center">
+                              <span className="text-xs font-black" style={{ color: mgColor }}>{margin.toFixed(0)}%</span>
                               {prodSizes.length > 1 && (
-                                <button type="button" onClick={() => setProdSizes(prev => prev.filter((_, i) => i !== idx))} className="block mx-auto text-slate-300 hover:text-rose-400 transition-colors">
+                                <button type="button" onClick={() => setProdSizes(prev => prev.filter((_, i) => i !== idx))} className="block mx-auto mt-0.5 text-slate-300 hover:text-rose-400 transition-colors">
                                   <X className="w-3 h-3" />
                                 </button>
                               )}
@@ -876,49 +957,54 @@ export const CatalogManager: React.FC = () => {
                         );
                       })}
                     </div>
-                  </section>
-                  {/* Fidelizacion */}
-                  <section className="space-y-2">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fidelización</p>
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <label className="text-[10px] text-slate-500 font-medium block mb-1">Puntos al comprar</label>
+                  </div>
+
+                  {/* ─── FIDELIZACION ─── */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Fidelización</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5">Puntos al comprar</label>
                         <input type="number" min={0} value={prodPointsEarned} onChange={e => setProdPointsEarned(Number(e.target.value))}
-                          className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-800 text-sm focus:outline-none focus:border-amber-400" />
+                          className="w-full px-4 py-3 rounded-2xl text-sm font-mono font-bold text-slate-800 focus:outline-none transition-all"
+                          style={{ border: '1.5px solid #e2e8f0', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} />
                       </div>
-                      <label className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all flex-1 ${prodPointsDiscountApplicable ? 'border-amber-300 bg-amber-50' : 'border-slate-200'}`}>
-                        <div className={`w-8 h-5 rounded-full relative transition-colors shrink-0 ${prodPointsDiscountApplicable ? 'bg-amber-500' : 'bg-slate-200'}`}>
-                          <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodPointsDiscountApplicable ? 'translate-x-3' : 'translate-x-0.5'}`} />
+                      <label className={`flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer transition-all ${prodPointsDiscountApplicable ? 'bg-amber-50' : 'bg-white'}`}
+                        style={{ border: `1.5px solid ${prodPointsDiscountApplicable ? '#fcd34d' : '#e2e8f0'}` }}>
+                        <div className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${prodPointsDiscountApplicable ? 'bg-amber-400' : 'bg-slate-200'}`}>
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${prodPointsDiscountApplicable ? 'translate-x-5' : 'translate-x-1'}`} />
                           <input type="checkbox" checked={prodPointsDiscountApplicable} onChange={e => setProdPointsDiscountApplicable(e.target.checked)} className="sr-only" />
                         </div>
-                        <span className="text-xs font-semibold text-slate-700">Aplica desc. puntos</span>
+                        <span className="text-xs font-semibold text-slate-700 leading-tight">Aplica desc. puntos</span>
                       </label>
                     </div>
-                  </section>
-                  {/* Toppings */}
-                  <section className="space-y-2">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Toppings</p>
-                    <div className="flex gap-1 p-1 bg-slate-100 rounded-xl">
+                  </div>
+
+                  {/* ─── TOPPINGS ─── */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Toppings</p>
+                    <div className="flex gap-2 p-1.5 rounded-2xl" style={{ background: '#f1f5f9' }}>
                       <button type="button" onClick={() => { setProdToppingsRestricted(false); setProdAllowedToppings([]); }}
-                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${!prodToppingsRestricted ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500'}`}>
-                        Todos
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${!prodToppingsRestricted ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                        Todos los toppings
                       </button>
                       <button type="button" onClick={() => setProdToppingsRestricted(true)}
-                        className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${prodToppingsRestricted ? 'bg-white text-amber-700 shadow-sm' : 'text-slate-500'}`}>
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${prodToppingsRestricted ? 'bg-white text-amber-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                         Personalizado
                       </button>
                     </div>
                     {prodToppingsRestricted && (
-                      <div className="grid grid-cols-2 gap-1.5 max-h-36 overflow-y-auto">
+                      <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-0.5">
                         {toppings.map(t => {
                           const active = prodAllowedToppings.includes(t.id);
                           return (
                             <button key={t.id} type="button"
                               onClick={() => setProdAllowedToppings(prev => prev.includes(t.id) ? prev.filter(x => x !== t.id) : [...prev, t.id])}
-                              className={`p-2.5 rounded-xl text-left text-xs transition-all border ${active ? 'border-amber-400 bg-amber-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                              className={`p-3 rounded-2xl text-left text-xs transition-all ${active ? 'bg-amber-50' : 'bg-white hover:bg-slate-50'}`}
+                              style={{ border: `1.5px solid ${active ? '#fcd34d' : '#e2e8f0'}` }}>
                               <div className="flex items-center justify-between gap-1">
                                 <span className={`font-semibold truncate ${active ? 'text-amber-900' : 'text-slate-700'}`}>{t.name}</span>
-                                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${active ? 'border-amber-500 bg-amber-500' : 'border-slate-300'}`}>
+                                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${active ? 'bg-amber-400 border-amber-400' : 'border-slate-300'}`}>
                                   {active && <Check className="w-2.5 h-2.5 text-white" />}
                                 </div>
                               </div>
@@ -927,18 +1013,20 @@ export const CatalogManager: React.FC = () => {
                         })}
                       </div>
                     )}
-                  </section>
+                  </div>
+
                 </div>
               </div>
-              {/* Footer */}
-              <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+
+              {/* ─── FOOTER ─── */}
+              <div className="px-6 py-4 flex items-center justify-between gap-3 shrink-0" style={{ borderTop: '1px solid #f1f5f9', background: 'white' }}>
                 <button type="button" onClick={() => setIsProductModalOpen(false)}
                   className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-100 transition-all">
                   Cancelar
                 </button>
                 <button type="submit"
-                  className="px-7 py-2.5 rounded-xl font-black text-white text-sm shadow-lg transition-all active:scale-[0.98]"
-                  style={{ background: 'linear-gradient(135deg,#f59e0b,#ea580c)', boxShadow: '0 6px 20px -4px rgba(245,158,11,0.5)' }}>
+                  className="px-8 py-3 rounded-2xl font-black text-white text-sm transition-all active:scale-[0.97]"
+                  style={{ background: 'linear-gradient(135deg,#f59e0b 0%,#ea580c 100%)', boxShadow: '0 8px 24px -6px rgba(245,158,11,0.55)' }}>
                   {editingProductId ? '💾 Guardar Cambios' : '✨ Crear Producto'}
                 </button>
               </div>
