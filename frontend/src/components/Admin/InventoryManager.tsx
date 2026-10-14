@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { InventoryItem } from '../../types';
+import { InventoryItem, Expense } from '../../types';
+import { RecipeProductionManager } from './RecipeProductionManager';
 import { formatMoney } from '../../utils/format';
 import {
   Boxes,
@@ -20,7 +21,9 @@ import {
 } from 'lucide-react';
 
 export const InventoryManager: React.FC = () => {
-  const { inventory, updateInventoryStock, addInventoryItem, config } = useApp();
+  const { inventory, updateInventoryStock, addInventoryItem, addExpense, config } = useApp();
+  const [inventorySubTab, setInventorySubTab] = useState<'stock' | 'recipes'>('stock');
+  const [inflowLinkToFinances, setInflowLinkToFinances] = useState<boolean>(true);
   const [filterCategory, setFilterCategory] = useState<string>('Todos');
   const [filterStatus, setFilterStatus] = useState<'all' | 'optimal' | 'low' | 'empty'>('all');
   const [search, setSearch] = useState('');
@@ -95,7 +98,24 @@ export const InventoryManager: React.FC = () => {
   const handleInflow = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItemId || adjustAmount <= 0) return;
+    const item = inventory.find(i => i.id === selectedItemId);
+    const totalCost = Number(adjustAmount) * (item?.costPerUnit || 0);
+
     updateInventoryStock(selectedItemId, Number(adjustAmount));
+
+    if (inflowLinkToFinances && totalCost > 0 && item) {
+      let cat: Expense['category'] = 'Insumos & Frutas';
+      if (item.category === 'Hielo & Agua') cat = 'Hielo & Jarabes';
+      else if (item.category === 'Vasos & Empaques') cat = 'Vasos & Empaques';
+
+      addExpense({
+        date: new Date().toISOString(),
+        category: cat,
+        description: `Entrada de Bodega: ${adjustAmount} ${item.unit} de ${item.name} ${adjustNote ? `(${adjustNote})` : ''}`,
+        amount: totalCost,
+      });
+    }
+
     setAdjustAmount(5);
     setAdjustNote('');
     setIsInflowModalOpen(false);
@@ -112,6 +132,39 @@ export const InventoryManager: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Subtab Navigation: Bodega vs Recetario */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit">
+        <button
+          type="button"
+          onClick={() => setInventorySubTab('stock')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            inventorySubTab === 'stock'
+              ? 'bg-white text-slate-900 shadow-xs'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Boxes className="w-4 h-4 text-amber-500" />
+          <span>Existencias en Bodega ({totalItems})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setInventorySubTab('recipes')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            inventorySubTab === 'recipes'
+              ? 'bg-white text-slate-900 shadow-xs'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <BookOpen className="w-4 h-4 text-amber-500" />
+          <span>Recetario & Máquina (Onzas ⇄ Litros/Kilos)</span>
+        </button>
+      </div>
+
+      {inventorySubTab === 'recipes' ? (
+        <RecipeProductionManager />
+      ) : (
+        <>
       {/* Header and Fast Actions */}
       <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -130,11 +183,11 @@ export const InventoryManager: React.FC = () => {
 
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setShowRecipesGuide(!showRecipesGuide)}
+            onClick={() => setInventorySubTab('recipes')}
             className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <BookOpen className="w-3.5 h-3.5 text-amber-600" />
-            <span>{showRecipesGuide ? 'Ocultar Recetario' : 'Ver Recetario & Consumo'}</span>
+            <span>Ir al Recetario & Máquina ↗</span>
           </button>
 
           <button
@@ -431,6 +484,9 @@ export const InventoryManager: React.FC = () => {
         </div>
       </div>
 
+        </>
+      )}
+
       {/* Modal: Entrada de Mercancía / Compra */}
       {isInflowModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
@@ -487,6 +543,39 @@ export const InventoryManager: React.FC = () => {
                   className="w-full px-3 py-2 rounded-xl border border-slate-200"
                 />
               </div>
+
+              {/* Costo Total & Vínculo con Finanzas */}
+              {(() => {
+                const item = inventory.find(i => i.id === selectedItemId);
+                const totalCost = Number(adjustAmount) * (item?.costPerUnit || 0);
+                return (
+                  <div className="space-y-2 pt-1 border-t border-slate-100">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-500 font-medium">Costo Total Compra:</span>
+                      <strong className="text-slate-900 font-mono text-sm">
+                        {formatMoney(totalCost, config.currencySymbol)}
+                      </strong>
+                    </div>
+
+                    <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/50 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={inflowLinkToFinances}
+                        onChange={e => setInflowLinkToFinances(e.target.checked)}
+                        className="rounded text-emerald-600 focus:ring-emerald-400 w-4 h-4 mt-0.5 cursor-pointer"
+                      />
+                      <div>
+                        <span className="font-bold text-emerald-900 block text-[11px] leading-tight">
+                          Registrar como egreso en Finanzas & Caja
+                        </span>
+                        <span className="text-[10px] text-emerald-700 block mt-0.5">
+                          Aparecerá en el reporte de gastos y afectará el balance financiero
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                );
+              })()}
 
               <div className="pt-2 flex justify-end gap-2">
                 <button
